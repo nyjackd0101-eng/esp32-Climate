@@ -50,9 +50,15 @@
         .hero-meta-sub { width: 100%; text-align: right; color: rgba(244,241,235,.45); font-size: 10px; letter-spacing: .05em; margin-top: 4px; }
         
         .readings-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-        .reading-card { min-height: 306px; padding: 18px 17px 15px; border-radius: 22px; background: linear-gradient(145deg, rgba(255,255,255,.2), rgba(255,255,255,.07) 48%, rgba(0,0,0,.12)); border: 1px solid rgba(255,255,255,.48); box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 14px 34px rgba(0,0,0,.2); backdrop-filter: blur(13px) saturate(125%); -webkit-backdrop-filter: blur(13px) saturate(125%); transition: transform .25s ease, background .25s ease, box-shadow .25s ease; }
+        
+        /* Interactive Cards */
+        .reading-card { position: relative; min-height: 306px; padding: 18px 17px 15px; border-radius: 22px; background: linear-gradient(145deg, rgba(255,255,255,.2), rgba(255,255,255,.07) 48%, rgba(0,0,0,.12)); border: 1px solid rgba(255,255,255,.48); box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 14px 34px rgba(0,0,0,.2); backdrop-filter: blur(13px) saturate(125%); -webkit-backdrop-filter: blur(13px) saturate(125%); transition: transform .25s ease, background .25s ease, box-shadow .25s ease, border-color .25s ease; }
         .reading-card:hover { transform: translateY(-4px); background: linear-gradient(145deg, rgba(255,255,255,.25), rgba(255,255,255,.1) 48%, rgba(0,0,0,.08)); box-shadow: inset 0 1px 0 rgba(255,255,255,.36), 0 18px 40px rgba(0,0,0,.24); }
         
+        /* DYNAMIC ALERT STATES */
+        .reading-card.alert-warning { background: linear-gradient(145deg, rgba(255,165,0,0.25), rgba(255,165,0,0.08) 48%, rgba(0,0,0,.12)); border-color: rgba(255,165,0,0.6); box-shadow: inset 0 1px 0 rgba(255,165,0,.4), 0 14px 34px rgba(255,165,0,.15); }
+        .reading-card.alert-danger { background: linear-gradient(145deg, rgba(255,50,50,0.25), rgba(255,50,50,0.08) 48%, rgba(0,0,0,.12)); border-color: rgba(255,50,50,0.6); box-shadow: inset 0 1px 0 rgba(255,50,50,.4), 0 14px 34px rgba(255,50,50,.15); }
+
         .card-topline { gap: 10px; color: rgba(244,241,235,.68); }
         .card-index { color: rgba(244,241,235,.34); }
         .card-label { flex: 1; }
@@ -70,12 +76,26 @@
         .trend-row { justify-content: space-between; color: rgba(244,241,235,.4); border-top: 1px solid rgba(255,255,255,.16); padding-top: 11px; }
         .trend-row b { color: rgba(244,241,235,.75); font-weight: 400; }
         
+        /* STATIC & INTERACTIVE GRAPH AESTHETICS */
         .mini-chart { display: block; width: 100%; height: 88px; margin-top: 22px; overflow: visible; }
         .chart-grid { stroke: rgba(255,255,255,.11); stroke-width: 1; stroke-dasharray: 2 4; }
         .chart-line { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 5px currentColor); }
-        .chart-dot { fill: currentColor; stroke: #0d0d0c; stroke-width: 2; }
+        .chart-dot { fill: currentColor; stroke: #0d0d0c; stroke-width: 2; transition: cy 0.3s ease; }
         .chart-axis { justify-content: space-between; color: rgba(244,241,235,.33); font-size: 8px; letter-spacing: .05em; margin-top: 3px; }
         
+        /* HOVER TOOLTIPS & CROSSHAIR */
+        .crosshair { stroke: rgba(255,255,255,0.4); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0; transition: opacity 0.1s; pointer-events: none; }
+        .hover-target { cursor: crosshair; }
+        .chart-tooltip { position: absolute; opacity: 0; background: rgba(0,0,0,0.85); border: 1px solid rgba(255,255,255,0.25); padding: 8px 12px; border-radius: 10px; pointer-events: none; transform: translate(-50%, -120%); text-align: center; z-index: 10; transition: opacity 0.1s ease; box-shadow: 0 4px 16px rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+        .tooltip-val { font-weight: bold; font-size: 16px; color: #fff; margin-bottom: 3px; letter-spacing: 0; }
+        .tooltip-time { color: #aaa; font-size: 9px; letter-spacing: .05em; }
+
+        /* TIMEFRAME BUTTONS */
+        .time-controls { display: flex; gap: 8px; margin-top: 24px; }
+        .time-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: rgba(244,241,235,.5); padding: 6px 14px; border-radius: 12px; font-size: 10px; font-family: inherit; font-weight: bold; letter-spacing: .1em; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(5px); }
+        .time-btn:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.3); }
+        .time-btn.active { background: rgba(255,255,255,0.2); color: #fff; border-color: rgba(255,255,255,0.6); box-shadow: 0 0 10px rgba(255,255,255,0.1); }
+
         .dashboard-footer { justify-content: space-between; border-top: 1px solid rgba(255,255,255,.22); margin-top: 34px; padding-top: 18px; color: rgba(244,241,235,.48); gap: 18px; }
         .footer-note { gap: 8px; }
         .footer-rule { width: 24px; height: 1px; background: rgba(244,241,235,.65); }
@@ -93,7 +113,7 @@
             .dashboard-footer { align-items: flex-start; flex-direction: column; } 
             .footer-location { display: none; } 
         }
-        @media (prefers-reduced-motion: reduce) { .reading-card { transition: none; } }
+        @media (prefers-reduced-motion: reduce) { .reading-card, .chart-dot, .time-btn { transition: none; } }
     </style>
 </head>
 <body>
@@ -122,6 +142,14 @@
                 <div>
                     <p class="eyebrow">ENVIRONMENTAL OBSERVATION</p>
                     <h2 id="overview-title">The air around you,<br /><em>in real time.</em></h2>
+                    
+                    <!-- NEW TIMEFRAME BUTTONS -->
+                    <div class="time-controls">
+                        <button class="time-btn" onclick="setTimeframe(60, this)">1H</button>
+                        <button class="time-btn active" onclick="setTimeframe(360, this)">6H</button>
+                        <button class="time-btn" onclick="setTimeframe(1440, this)">24H</button>
+                        <button class="time-btn" onclick="setTimeframe(10080, this)">7D</button>
+                    </div>
                 </div>
                 <div class="hero-meta">
                     <i data-lucide="cloud" style="width: 18px; height: 18px;"></i>
@@ -133,7 +161,7 @@
             <section class="readings-grid" aria-label="Current air quality readings">
                 
                 <!-- CARD 1: TEMPERATURE -->
-                <article class="reading-card card-orange">
+                <article class="reading-card card-orange" id="card-temp">
                     <div class="card-topline">
                         <span class="card-index">01</span>
                         <span class="card-label">Temperature</span>
@@ -143,17 +171,31 @@
                         <strong id="val-temp">--</strong>
                         <span>°F</span>
                     </div>
-                    <div class="trend-row"><span>6H TREND</span><b id="trend-temp">LIVE</b></div>
-                    <svg class="mini-chart" viewBox="0 0 360 88" role="img">
+                    <div class="trend-row"><span class="trend-label">6H TREND</span><b id="trend-temp">LIVE</b></div>
+                    
+                    <!-- HTML Tooltip Box -->
+                    <div class="chart-tooltip" id="tip-temp">
+                        <div class="tooltip-val">--</div>
+                        <div class="tooltip-time">--</div>
+                    </div>
+                    
+                    <svg class="mini-chart" viewBox="0 0 360 88" role="img" preserveAspectRatio="none">
                         <path class="chart-grid" d="M0 22H360M0 44H360M0 66H360" />
                         <polyline id="poly-temp" class="chart-line" points="" />
+                        <line id="cross-temp" class="crosshair" x1="0" y1="0" x2="0" y2="88" />
                         <circle id="dot-temp" class="chart-dot" cx="360" cy="44" r="3.5" opacity="0" />
+                        <!-- Invisible overlay to detect mouse movement -->
+                        <rect class="hover-target" x="0" y="0" width="360" height="88" fill="transparent" 
+                              onmousemove="handleHover(event, 'temp', 'field1', '°F')" 
+                              onmouseleave="hideHover('temp')" 
+                              ontouchmove="handleHover(event, 'temp', 'field1', '°F')" 
+                              ontouchend="hideHover('temp')" />
                     </svg>
-                    <div class="chart-axis"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
+                    <div class="chart-axis" id="axis-temp"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
                 </article>
 
                 <!-- CARD 2: HUMIDITY -->
-                <article class="reading-card card-cyan">
+                <article class="reading-card card-cyan" id="card-hum">
                     <div class="card-topline">
                         <span class="card-index">02</span>
                         <span class="card-label">Humidity</span>
@@ -163,17 +205,29 @@
                         <strong id="val-hum">--</strong>
                         <span>%</span>
                     </div>
-                    <div class="trend-row"><span>6H TREND</span><b id="trend-hum">LIVE</b></div>
-                    <svg class="mini-chart" viewBox="0 0 360 88" role="img">
+                    <div class="trend-row"><span class="trend-label">6H TREND</span><b id="trend-hum">LIVE</b></div>
+                    
+                    <div class="chart-tooltip" id="tip-hum">
+                        <div class="tooltip-val">--</div>
+                        <div class="tooltip-time">--</div>
+                    </div>
+                    
+                    <svg class="mini-chart" viewBox="0 0 360 88" role="img" preserveAspectRatio="none">
                         <path class="chart-grid" d="M0 22H360M0 44H360M0 66H360" />
                         <polyline id="poly-hum" class="chart-line" points="" />
+                        <line id="cross-hum" class="crosshair" x1="0" y1="0" x2="0" y2="88" />
                         <circle id="dot-hum" class="chart-dot" cx="360" cy="44" r="3.5" opacity="0" />
+                        <rect class="hover-target" x="0" y="0" width="360" height="88" fill="transparent" 
+                              onmousemove="handleHover(event, 'hum', 'field2', '%')" 
+                              onmouseleave="hideHover('hum')"
+                              ontouchmove="handleHover(event, 'hum', 'field2', '%')" 
+                              ontouchend="hideHover('hum')" />
                     </svg>
-                    <div class="chart-axis"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
+                    <div class="chart-axis" id="axis-hum"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
                 </article>
 
                 <!-- CARD 3: PRESSURE -->
-                <article class="reading-card card-green">
+                <article class="reading-card card-green" id="card-pres">
                     <div class="card-topline">
                         <span class="card-index">03</span>
                         <span class="card-label">Pressure</span>
@@ -183,17 +237,29 @@
                         <strong id="val-pres">--</strong>
                         <span>hPa</span>
                     </div>
-                    <div class="trend-row"><span>6H TREND</span><b id="trend-pres">LIVE</b></div>
-                    <svg class="mini-chart" viewBox="0 0 360 88" role="img">
+                    <div class="trend-row"><span class="trend-label">6H TREND</span><b id="trend-pres">LIVE</b></div>
+                    
+                    <div class="chart-tooltip" id="tip-pres">
+                        <div class="tooltip-val">--</div>
+                        <div class="tooltip-time">--</div>
+                    </div>
+
+                    <svg class="mini-chart" viewBox="0 0 360 88" role="img" preserveAspectRatio="none">
                         <path class="chart-grid" d="M0 22H360M0 44H360M0 66H360" />
                         <polyline id="poly-pres" class="chart-line" points="" />
+                        <line id="cross-pres" class="crosshair" x1="0" y1="0" x2="0" y2="88" />
                         <circle id="dot-pres" class="chart-dot" cx="360" cy="44" r="3.5" opacity="0" />
+                        <rect class="hover-target" x="0" y="0" width="360" height="88" fill="transparent" 
+                              onmousemove="handleHover(event, 'pres', 'field3', ' hPa')" 
+                              onmouseleave="hideHover('pres')"
+                              ontouchmove="handleHover(event, 'pres', 'field3', ' hPa')" 
+                              ontouchend="hideHover('pres')" />
                     </svg>
-                    <div class="chart-axis"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
+                    <div class="chart-axis" id="axis-pres"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
                 </article>
 
                 <!-- CARD 4: VOC GAS -->
-                <article class="reading-card card-violet">
+                <article class="reading-card card-violet" id="card-voc">
                     <div class="card-topline">
                         <span class="card-index">04</span>
                         <span class="card-label">VOC Gas Status</span>
@@ -203,13 +269,25 @@
                         <strong id="val-voc">--</strong>
                         <span id="val-voc-raw">Ohms</span>
                     </div>
-                    <div class="trend-row"><span>6H TREND</span><b id="trend-voc">LIVE</b></div>
-                    <svg class="mini-chart" viewBox="0 0 360 88" role="img">
+                    <div class="trend-row"><span class="trend-label">6H TREND</span><b id="trend-voc">LIVE</b></div>
+                    
+                    <div class="chart-tooltip" id="tip-voc">
+                        <div class="tooltip-val">--</div>
+                        <div class="tooltip-time">--</div>
+                    </div>
+
+                    <svg class="mini-chart" viewBox="0 0 360 88" role="img" preserveAspectRatio="none">
                         <path class="chart-grid" d="M0 22H360M0 44H360M0 66H360" />
                         <polyline id="poly-voc" class="chart-line" points="" />
+                        <line id="cross-voc" class="crosshair" x1="0" y1="0" x2="0" y2="88" />
                         <circle id="dot-voc" class="chart-dot" cx="360" cy="44" r="3.5" opacity="0" />
+                        <rect class="hover-target" x="0" y="0" width="360" height="88" fill="transparent" 
+                              onmousemove="handleHover(event, 'voc', 'field4', 'Ohms')" 
+                              onmouseleave="hideHover('voc')"
+                              ontouchmove="handleHover(event, 'voc', 'field4', 'Ohms')" 
+                              ontouchend="hideHover('voc')" />
                     </svg>
-                    <div class="chart-axis"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
+                    <div class="chart-axis" id="axis-voc"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
                 </article>
 
             </section>
@@ -230,8 +308,96 @@
         const channelID = "3533182"; 
         const readAPIKey = "Z60FSMP5NL35597N";
 
-        // Changed to fetch the last 360 minutes (6 hours) of data
-        const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${readAPIKey}&minutes=360`;
+
+        // Global state
+        let currentMinutes = 360; // Default to 6H
+        let globalFeedData = [];  // Stores the downloaded data for tooltips
+
+        // Handles timeframe button clicks
+        function setTimeframe(minutes, btnElement) {
+            currentMinutes = minutes;
+            
+            // Swap active button styling
+            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            
+            document.getElementById('timestamp').innerText = "FETCHING DATA...";
+            
+            // Update X-axis labels to match the new timeframe
+            let labels = [];
+            if(minutes === 60) labels = ['-60M', '-40M', '-20M', 'NOW'];
+            else if(minutes === 360) labels = ['-6H', '-4H', '-2H', 'NOW'];
+            else if(minutes === 1440) labels = ['-24H', '-16H', '-8H', 'NOW'];
+            else labels = ['-7D', '-5D', '-2D', 'NOW'];
+            
+            // Update text for all cards
+            ['temp', 'hum', 'pres', 'voc'].forEach(id => {
+                const axis = document.getElementById(`axis-${id}`);
+                axis.innerHTML = `<span>${labels[0]}</span><span>${labels[1]}</span><span>${labels[2]}</span><span>${labels[3]}</span>`;
+                
+                // Also update the small Trend label text
+                const labelStr = (minutes === 60) ? "1H" : (minutes === 360) ? "6H" : (minutes === 1440) ? "24H" : "7D";
+                document.querySelector(`#card-${id} .trend-label`).innerText = `${labelStr} TREND`;
+            });
+
+            // Fetch new data immediately
+            fetchData();
+        }
+
+        // Handles the hover crosshair and tooltip math
+        function handleHover(event, id, fieldKey, unit) {
+            if (!globalFeedData.length) return;
+            
+            // Ensure we are working with valid touch or mouse events
+            const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+            
+            const validData = globalFeedData.filter(d => d[fieldKey] !== null);
+            if (!validData.length) return;
+
+            const rect = event.target.getBoundingClientRect();
+            let percentX = (clientX - rect.left) / rect.width;
+            if (percentX < 0) percentX = 0;
+            if (percentX > 1) percentX = 1;
+
+            // Map the cursor percentage to the exact data point in the array
+            const index = Math.round(percentX * (validData.length - 1));
+            const dataPoint = validData[index];
+            const val = parseFloat(dataPoint[fieldKey]);
+
+            // Format specific values
+            let valStr = val.toFixed(1) + unit;
+            if (id === 'pres') valStr = val.toFixed(0) + unit;
+            if (id === 'voc') valStr = (val/1000).toFixed(1) + ' kΩ';
+
+            const date = new Date(dataPoint.created_at);
+            const timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', month: 'short', day: 'numeric'});
+
+            // Move Crosshair visually inside the SVG (360px wide)
+            const crossX = percentX * 360; 
+            const crosshair = document.getElementById(`cross-${id}`);
+            crosshair.setAttribute('x1', crossX);
+            crosshair.setAttribute('x2', crossX);
+            crosshair.style.opacity = '1';
+
+            // Populate HTML Tooltip
+            const tooltip = document.getElementById(`tip-${id}`);
+            tooltip.querySelector('.tooltip-val').innerText = valStr;
+            tooltip.querySelector('.tooltip-time').innerText = timeStr;
+            
+            // Move HTML Tooltip relative to the card container
+            const cardRect = document.getElementById(`card-${id}`).getBoundingClientRect();
+            const relativeX = (clientX - cardRect.left);
+            const relativeY = (rect.top - cardRect.top) + 20; // 20px dip into the graph
+            
+            tooltip.style.left = `${relativeX}px`;
+            tooltip.style.top = `${relativeY}px`;
+            tooltip.style.opacity = '1';
+        }
+
+        function hideHover(id) {
+            document.getElementById(`cross-${id}`).style.opacity = '0';
+            document.getElementById(`tip-${id}`).style.opacity = '0';
+        }
 
         function getGasStatus(gasOhms) {
             if (gasOhms > 50000) return "GOOD";
@@ -239,19 +405,17 @@
             return "POOR";
         }
 
-        // SVG Graph Generator Math
         function updateGraph(feedData, fieldKey, polyId, dotId) {
-            // Filter out null entries
             const validData = feedData.filter(d => d[fieldKey] !== null).map(d => parseFloat(d[fieldKey]));
             if (validData.length === 0) return;
 
             const min = Math.min(...validData);
             const max = Math.max(...validData);
-            const range = max - min || 1; // Avoid divide by zero if data is perfectly flat
+            const range = max - min || 1; 
 
             const svgWidth = 360;
             const svgHeight = 88;
-            const padding = 10; // Keep the line from hitting the absolute top/bottom borders
+            const padding = 10; 
             const drawHeight = svgHeight - (padding * 2);
 
             let points = [];
@@ -259,40 +423,41 @@
 
             validData.forEach((val, index) => {
                 const x = index * stepX;
-                // SVG Y=0 is at the top, so we invert the Y coordinate math
                 const y = padding + drawHeight - (((val - min) / range) * drawHeight);
                 points.push(`${x.toFixed(1)},${y.toFixed(1)}`);
             });
 
-            // Apply points to the polyline
             document.getElementById(polyId).setAttribute('points', points.join(' '));
             
-            // Move the glowing dot to the very last point
             const finalY = points[points.length - 1].split(',')[1];
             const dot = document.getElementById(dotId);
             dot.setAttribute('cy', finalY);
-            dot.setAttribute('opacity', '1'); // Make it visible once data loads
+            dot.setAttribute('opacity', '1'); 
         }
 
         function calculateTrendText(feedData, fieldKey, threshold, unit) {
             const validData = feedData.filter(d => d[fieldKey] !== null).map(d => parseFloat(d[fieldKey]));
             if (validData.length < 10) return "FLAT";
             
-            const firstReading = validData[0];
-            const lastReading = validData[validData.length - 1];
-            const diff = lastReading - firstReading;
-            
+            const diff = validData[validData.length - 1] - validData[0];
             if (Math.abs(diff) < threshold) return "FLAT";
             return (diff > 0 ? "+" : "") + diff.toFixed(1) + unit;
         }
 
         function fetchData() {
+            // Dynamically inject the active timeframe requested by the user
+            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${readAPIKey}&minutes=${currentMinutes}`;
+            
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
                     const feeds = data.feeds;
                     if(feeds && feeds.length > 0) {
-                        const latest = feeds[feeds.length - 1]; // The most recent reading
+                        
+                        // Save to global variable so the hover crosshair tool can read it
+                        globalFeedData = feeds;
+                        
+                        const latest = feeds[feeds.length - 1]; 
                         
                         // 1. Update large hero numbers
                         document.getElementById('val-temp').innerText = parseFloat(latest.field1).toFixed(1);
@@ -303,19 +468,28 @@
                         document.getElementById('val-voc').innerText = getGasStatus(rawGas);
                         document.getElementById('val-voc-raw').innerText = `(${(rawGas/1000).toFixed(1)} kΩ)`;
 
-                        // 2. Update the SVGs graphs using the full 6-hour history
+                        // 2. Dynamic Alert Colors
+                        const humCard = document.getElementById('card-hum');
+                        if (parseFloat(latest.field2) > 65) humCard.classList.add('alert-warning');
+                        else humCard.classList.remove('alert-warning');
+
+                        const vocCard = document.getElementById('card-voc');
+                        if (rawGas < 10000) vocCard.classList.add('alert-danger');
+                        else vocCard.classList.remove('alert-danger');
+
+                        // 3. Update SVG Graphs
                         updateGraph(feeds, 'field1', 'poly-temp', 'dot-temp');
                         updateGraph(feeds, 'field2', 'poly-hum', 'dot-hum');
                         updateGraph(feeds, 'field3', 'poly-pres', 'dot-pres');
                         updateGraph(feeds, 'field4', 'poly-voc', 'dot-voc');
 
-                        // 3. Update the 6H Trend math text
+                        // 4. Update Trend Text
                         document.getElementById('trend-temp').innerText = calculateTrendText(feeds, 'field1', 1.0, '°');
                         document.getElementById('trend-hum').innerText = calculateTrendText(feeds, 'field2', 2.0, '%');
                         document.getElementById('trend-pres').innerText = calculateTrendText(feeds, 'field3', 2.0, '');
                         document.getElementById('trend-voc').innerText = (rawGas - parseFloat(feeds[0].field4) > 5000) ? "IMPROVING" : "STABLE";
 
-                        // 4. Update timestamps
+                        // 5. Update Timestamps
                         const date = new Date(latest.created_at);
                         const timeString = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                         const dateString = date.toLocaleDateString([], {month: 'short', day: 'numeric', year: 'numeric'}).toUpperCase();
@@ -327,6 +501,7 @@
                 .catch(error => console.error('Error fetching data:', error));
         }
 
+        // Fetch immediately, then loop every 60 seconds
         fetchData();
         setInterval(fetchData, 60000);
     </script>
