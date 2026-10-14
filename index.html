@@ -3,147 +3,280 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dorm Air Quality</title>
+    <title>Atmosphere Dashboard</title>
+    
+    <!-- Script to load the Lucide icons used in the v0 design -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
-        /* CSS: The Paint and Structure */
-        body {
-            background-color: #121212; /* Dark mode background */
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        /* --- MERGED CSS FROM v0 GLOBALS.CSS --- */
+        :root {
+            font-family: Consolas, 'Lucida Console', Monaco, Menlo, 'SF Mono', monospace;
+            color: #f4f1eb;
+            background: #0b0b0a;
+            font-synthesis: none;
         }
 
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 5px;
-        }
+        * { box-sizing: border-box; }
+        html { background: #0b0b0a; }
+        body { margin: 0; min-width: 320px; color: #fffdf8; }
 
-        #timestamp {
-            color: #888;
-            margin-bottom: 30px;
-            font-size: 1rem;
+        .dashboard-shell {
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(90deg, rgba(8,8,7,.74) 0%, rgba(8,8,7,.32) 49%, rgba(8,8,7,.62) 100%), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/000045940017-Gv5IhFr9zhwowubYwweuxWIipRwGqc.jpg') center / cover fixed;
         }
-
-        /* The Grid layout for our data cards */
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            width: 100%;
-            max-width: 800px;
+        .dashboard-shell::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(110deg, transparent 0 58%, rgba(255,255,255,.04) 58% 59%, transparent 59%); mix-blend-mode: screen; }
+        .grain { position: absolute; inset: 0; opacity: .08; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E"); mix-blend-mode: soft-light; }
+        .dashboard-content { position: relative; z-index: 1; width: min(1240px, calc(100% - 64px)); margin: auto; padding: 34px 0 28px; }
+        
+        .topbar, .status-line, .brand-lockup, .hero-row, .hero-meta, .card-topline, .trend-row, .chart-axis, .dashboard-footer, .footer-note { display: flex; align-items: center; }
+        .topbar { justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,.3); padding-bottom: 20px; }
+        .topbar, .dashboard-footer { border-radius: 0 0 16px 16px; }
+        .brand-lockup { gap: 12px; }
+        .brand-mark { display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid rgba(255,255,255,.65); border-radius: 50%; }
+        
+        .eyebrow, .card-label, .card-index, .status-line, .hero-meta, .trend-row, .chart-axis, .footer-note { font-size: 10px; letter-spacing: .14em; }
+        .eyebrow { color: rgba(255,253,248,.78); margin: 0; text-shadow: 0 1px 10px rgba(0,0,0,.55); }
+        h1 { font-size: 16px; font-weight: 500; letter-spacing: .08em; margin: 4px 0 0; color: #fffdf8; text-shadow: 0 1px 12px rgba(0,0,0,.6); }
+        .status-line { color: rgba(244,241,235,.66); gap: 10px; }
+        .status-dot { width: 7px; height: 7px; background: #90f76a; border-radius: 50%; box-shadow: 0 0 12px #90f76a; }
+        .status-divider { height: 14px; width: 1px; background: rgba(255,255,255,.26); }
+        
+        .hero-row { justify-content: space-between; padding: 64px 0 42px; align-items: end; }
+        h2 { font-size: clamp(38px, 5vw, 67px); line-height: .98; font-weight: 400; letter-spacing: -.065em; margin: 14px 0 0; color: #fffdf8; text-shadow: 0 2px 18px rgba(0,0,0,.65); }
+        h2 em { color: rgba(244,241,235,.57); font-style: normal; }
+        .hero-meta { gap: 8px; color: rgba(244,241,235,.8); flex-wrap: wrap; justify-content: end; max-width: 260px; }
+        .hero-meta-sub { width: 100%; text-align: right; color: rgba(244,241,235,.45); font-size: 10px; letter-spacing: .05em; margin-top: 4px; }
+        
+        .readings-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .reading-card { min-height: 306px; padding: 18px 17px 15px; border-radius: 22px; background: linear-gradient(145deg, rgba(255,255,255,.2), rgba(255,255,255,.07) 48%, rgba(0,0,0,.12)); border: 1px solid rgba(255,255,255,.48); box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 14px 34px rgba(0,0,0,.2); backdrop-filter: blur(13px) saturate(125%); -webkit-backdrop-filter: blur(13px) saturate(125%); transition: transform .25s ease, background .25s ease, box-shadow .25s ease; }
+        .reading-card:hover { transform: translateY(-4px); background: linear-gradient(145deg, rgba(255,255,255,.25), rgba(255,255,255,.1) 48%, rgba(0,0,0,.08)); box-shadow: inset 0 1px 0 rgba(255,255,255,.36), 0 18px 40px rgba(0,0,0,.24); }
+        
+        .card-topline { gap: 10px; color: rgba(244,241,235,.68); }
+        .card-index { color: rgba(244,241,235,.34); }
+        .card-label { flex: 1; }
+        .activity-icon { color: rgba(255,255,255,.48); width: 15px; height: 15px; }
+        
+        .reading-value { display: flex; align-items: baseline; gap: 8px; margin: 35px 0 12px; }
+        .reading-value strong { font-size: clamp(32px, 4vw, 48px); line-height: .9; letter-spacing: -.09em; font-weight: 500; }
+        .reading-value span { font-size: 13px; color: rgba(244,241,235,.6); }
+        
+        /* Card Colors */
+        .card-orange .reading-value strong, .card-orange .chart-line { color: #ff9b42; stroke: #ff9b42; }
+        .card-cyan .reading-value strong, .card-cyan .chart-line { color: #4ddcff; stroke: #4ddcff; }
+        .card-green .reading-value strong, .card-green .chart-line { color: #9cff57; stroke: #9cff57; }
+        .card-violet .reading-value strong, .card-violet .chart-line { color: #d59cff; stroke: #d59cff; }
+        
+        .trend-row { justify-content: space-between; color: rgba(244,241,235,.4); border-top: 1px solid rgba(255,255,255,.16); padding-top: 11px; }
+        .trend-row b { color: rgba(244,241,235,.75); font-weight: 400; }
+        
+        /* Static Graph Aesthetics */
+        .mini-chart { display: block; width: 100%; height: 88px; margin-top: 22px; overflow: visible; }
+        .chart-grid { stroke: rgba(255,255,255,.11); stroke-width: 1; stroke-dasharray: 2 4; }
+        .chart-line { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 5px currentColor); }
+        .chart-dot { fill: currentColor; stroke: #0d0d0c; stroke-width: 2; }
+        .chart-axis { justify-content: space-between; color: rgba(244,241,235,.33); font-size: 8px; letter-spacing: .05em; margin-top: 3px; }
+        
+        .dashboard-footer { justify-content: space-between; border-top: 1px solid rgba(255,255,255,.22); margin-top: 34px; padding-top: 18px; color: rgba(244,241,235,.48); gap: 18px; }
+        .footer-note { gap: 8px; }
+        .footer-rule { width: 24px; height: 1px; background: rgba(244,241,235,.65); }
+        .footer-location { color: rgba(244,241,235,.3); }
+        
+        /* Mobile Layout */
+        @media (max-width: 900px) { .readings-grid { grid-template-columns: repeat(2, 1fr); } .hero-row { padding-top: 48px; } }
+        @media (max-width: 620px) { 
+            .dashboard-content { width: min(100% - 32px, 520px); padding-top: 20px; } 
+            .status-line { display: none; } 
+            .hero-row { display: block; padding: 46px 0 30px; } 
+            .hero-meta { justify-content: start; margin-top: 26px; } 
+            .hero-meta-sub { text-align: left; } 
+            .readings-grid { grid-template-columns: 1fr; } 
+            .reading-card { min-height: 278px; } 
+            .dashboard-footer { align-items: flex-start; flex-direction: column; } 
+            .footer-location { display: none; } 
         }
-
-        /* The bubbly, chunky card style */
-        .card {
-            background-color: #1e1e1e;
-            border-radius: 25px; /* Makes the corners very round/bubbly */
-            padding: 30px 20px;
-            text-align: center;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px); /* Gentle hover effect */
-        }
-
-        .card h2 {
-            margin: 0 0 10px 0;
-            font-size: 1.2rem;
-            color: #aaaaaa;
-        }
-
-        .value {
-            font-size: 3rem; /* Huge numbers */
-            font-weight: bold;
-            margin: 0;
-        }
-
-        .unit {
-            font-size: 1.2rem;
-            color: #888;
-        }
+        @media (prefers-reduced-motion: reduce) { .reading-card { transition: none; } }
     </style>
 </head>
 <body>
 
-    <h1>Dorm Air Quality</h1>
-    <div id="timestamp">Waiting for data...</div>
+    <main class="dashboard-shell">
+        <div class="grain" aria-hidden="true"></div>
+        <div class="dashboard-content">
+            
+            <!-- HEADER -->
+            <header class="topbar">
+                <div class="brand-lockup">
+                    <div class="brand-mark"><i data-lucide="wind" style="width: 18px; height: 18px;"></i></div>
+                    <div>
+                        <p class="eyebrow">FIELD INSTRUMENT / 04</p>
+                        <h1>Atmosphere</h1>
+                    </div>
+                </div>
+                <div class="status-line">
+                    <span class="status-dot"></span>
+                    <span>MONITOR ONLINE</span>
+                    <span class="status-divider"></span>
+                    <span id="timestamp">SYNCING...</span>
+                </div>
+            </header>
 
-    <div class="dashboard">
-        <div class="card">
-            <h2>Temperature</h2>
-            <div class="value" id="temp">--</div>
-            <div class="unit">°F</div>
-        </div>
-        <div class="card">
-            <h2>Humidity</h2>
-            <div class="value" id="hum">--</div>
-            <div class="unit">%</div>
-        </div>
-        <div class="card">
-            <h2>Pressure</h2>
-            <div class="value" id="pres">--</div>
-            <div class="unit">hPa</div>
-        </div>
-        <div class="card">
-            <h2>VOC Status</h2>
-            <div class="value" id="voc">--</div>
-            <div class="unit" id="voc-raw">Ohms</div>
-        </div>
-    </div>
+            <!-- HERO SECTION -->
+            <section class="hero-row" aria-labelledby="overview-title">
+                <div>
+                    <p class="eyebrow">ENVIRONMENTAL OBSERVATION</p>
+                    <h2 id="overview-title">The air around you,<br /><em>in real time.</em></h2>
+                </div>
+                <div class="hero-meta">
+                    <i data-lucide="cloud" style="width: 18px; height: 18px;"></i>
+                    <span>WORCESTER / DORM 01</span>
+                    <span class="hero-meta-sub" id="last-synced">Fetching live data...</span>
+                </div>
+            </section>
 
+            <!-- DATA CARDS GRID -->
+            <section class="readings-grid" aria-label="Current air quality readings">
+                
+                <!-- CARD 1: TEMPERATURE -->
+                <article class="reading-card card-orange">
+                    <div class="card-topline">
+                        <span class="card-index">01</span>
+                        <span class="card-label">Temperature</span>
+                        <i data-lucide="activity" class="activity-icon"></i>
+                    </div>
+                    <div class="reading-value">
+                        <strong id="val-temp">--</strong>
+                        <span>°F</span>
+                    </div>
+                    <div class="trend-row"><span>24H TREND</span><b>LIVE</b></div>
+                    <svg class="mini-chart" viewBox="0 0 360 88" role="img">
+                        <path class="chart-grid" d="M0 22H360M0 44H360M0 66H360" />
+                        <polyline class="chart-line" points="0,68 18,62 36,65 54,48 72,53 90,42 108,46 126,34 144,38 162,28 180,35 198,23 216,30 234,20 252,25 270,18 288,24 306,15 324,21 342,12 360,18" />
+                        <circle class="chart-dot" cx="360" cy="18" r="3.5" />
+                    </svg>
+                    <div class="chart-axis"><span>00:00</span><span>06:00</span><span>12:00</span><span>NOW</span></div>
+                </article>
+
+                <!-- CARD 2: HUMIDITY -->
+                <article class="reading-card card-cyan">
+                    <div class="card-topline">
+                        <span class="card-index">02</span>
+                        <span class="card-label">Humidity</span>
+                        <i data-lucide="activity" class="activity-icon"></i>
+                    </div>
+                    <div class="reading-value">
+                        <strong id="val-hum">--</strong>
+                        <span>%</span>
+                    </div>
+                    <div class="trend-row"><span>24H TREND</span><b>LIVE</b></div>
+                    <svg class="mini-chart" viewBox="0 0 360 88" role="img">
+                        <path class="chart-grid" d="M0 22H360M0 44H360M0 66H360" />
+                        <polyline class="chart-line" points="0,32 18,35 36,30 54,41 72,38 90,46 108,40 126,51 144,45 162,57 180,49 198,60 216,53 234,66 252,58 270,69 288,63 306,72 324,68 342,77 360,70" />
+                        <circle class="chart-dot" cx="360" cy="70" r="3.5" />
+                    </svg>
+                    <div class="chart-axis"><span>00:00</span><span>06:00</span><span>12:00</span><span>NOW</span></div>
+                </article>
+
+                <!-- CARD 3: PRESSURE -->
+                <article class="reading-card card-green">
+                    <div class="card-topline">
+                        <span class="card-index">03</span>
+                        <span class="card-label">Pressure</span>
+                        <i data-lucide="activity" class="activity-icon"></i>
+                    </div>
+                    <div class="reading-value">
+                        <strong id="val-pres">--</strong>
+                        <span>hPa</span>
+                    </div>
+                    <div class="trend-row"><span>24H TREND</span><b>LIVE</b></div>
+                    <svg class="mini-chart" viewBox="0 0 360 88" role="img">
+                        <path class="chart-grid" d="M0 22H360M0 44H360M0 66H360" />
+                        <polyline class="chart-line" points="0,58 18,55 36,57 54,52 72,54 90,48 108,50 126,45 144,48 162,43 180,44 198,40 216,43 234,37 252,40 270,35 288,38 306,32 324,34 342,30 360,32" />
+                        <circle class="chart-dot" cx="360" cy="32" r="3.5" />
+                    </svg>
+                    <div class="chart-axis"><span>00:00</span><span>06:00</span><span>12:00</span><span>NOW</span></div>
+                </article>
+
+                <!-- CARD 4: VOC GAS -->
+                <article class="reading-card card-violet">
+                    <div class="card-topline">
+                        <span class="card-index">04</span>
+                        <span class="card-label">VOC Gas Status</span>
+                        <i data-lucide="activity" class="activity-icon"></i>
+                    </div>
+                    <div class="reading-value">
+                        <strong id="val-voc">--</strong>
+                        <span id="val-voc-raw">Ohms</span>
+                    </div>
+                    <div class="trend-row"><span>24H TREND</span><b>LIVE</b></div>
+                    <svg class="mini-chart" viewBox="0 0 360 88" role="img">
+                        <path class="chart-grid" d="M0 22H360M0 44H360M0 66H360" />
+                        <polyline class="chart-line" points="0,52 18,50 36,52 54,48 72,51 90,47 108,49 126,46 144,48 162,44 180,46 198,43 216,45 234,42 252,44 270,40 288,42 306,39 324,41 342,38 360,40" />
+                        <circle class="chart-dot" cx="360" cy="40" r="3.5" />
+                    </svg>
+                    <div class="chart-axis"><span>00:00</span><span>06:00</span><span>12:00</span><span>NOW</span></div>
+                </article>
+
+            </section>
+
+            <!-- FOOTER -->
+            <footer class="dashboard-footer">
+                <div class="footer-note"><span class="footer-rule"></span> <span>DATA WINDOW: LIVE STREAM</span></div>
+                <div class="footer-note"><i data-lucide="refresh-cw" style="width: 13px; height: 13px;"></i> <span>AUTO-REFRESH / 60 SEC</span></div>
+                <div class="footer-note footer-location">LAT 42.2626° N &nbsp; / &nbsp; LONG 71.8023° W</div>
+            </footer>
+        </div>
+    </main>
+
+    <!-- LIVE DATA JAVASCRIPT -->
     <script>
-        /* JavaScript: The Muscle that fetches and updates data */
-        
-        // REPLACE THESE TWO VARIABLES WITH YOUR ACTUAL NUMBERS
+        // 1. Initialize the SVG Icons
+        lucide.createIcons();
+
+        // 2. YOUR THINGSPEAK CREDENTIALS - UPDATE THESE!
         const channelID = "3533182"; 
         const readAPIKey = "Z60FSMP5NL35597N";
 
-        // The ThingSpeak API URL that asks for just the 1 most recent reading
         const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${readAPIKey}&results=1`;
 
-        // We recreate your ESP32 Python logic here in JavaScript
         function getGasStatus(gasOhms) {
-            if (gasOhms > 50000) return "Good";
-            if (gasOhms > 10000) return "Med";
-            return "Bad";
+            if (gasOhms > 50000) return "GOOD";
+            if (gasOhms > 10000) return "FAIR";
+            return "POOR";
         }
 
         function fetchData() {
-            // 'fetch' goes out to the internet, grabs the data, and parses the JSON
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    const feed = data.feeds[0]; // Get the newest data point
+                    const feed = data.feeds[0];
                     
                     if(feed) {
-                        // Update the HTML elements with the new numbers
-                        document.getElementById('temp').innerText = parseFloat(feed.field1).toFixed(1);
-                        document.getElementById('hum').innerText = parseFloat(feed.field2).toFixed(1);
-                        document.getElementById('pres').innerText = parseFloat(feed.field3).toFixed(0);
+                        // Inject live data into the HTML elements by their IDs
+                        document.getElementById('val-temp').innerText = parseFloat(feed.field1).toFixed(1);
+                        document.getElementById('val-hum').innerText = parseFloat(feed.field2).toFixed(1);
+                        document.getElementById('val-pres').innerText = parseFloat(feed.field3).toFixed(0);
                         
-                        // Process the raw gas ohms into Good/Med/Bad
                         const rawGas = parseFloat(feed.field4);
-                        document.getElementById('voc').innerText = getGasStatus(rawGas);
-                        document.getElementById('voc-raw').innerText = `(${(rawGas/1000).toFixed(1)} kOhm)`;
+                        document.getElementById('val-voc').innerText = getGasStatus(rawGas);
+                        document.getElementById('val-voc-raw').innerText = `(${(rawGas/1000).toFixed(1)} kΩ)`;
 
-                        // Format the timestamp nicely
+                        // Update timestamps
                         const date = new Date(feed.created_at);
-                        document.getElementById('timestamp').innerText = "Last updated: " + date.toLocaleTimeString();
+                        const timeString = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                        const dateString = date.toLocaleDateString([], {month: 'short', day: 'numeric', year: 'numeric'}).toUpperCase();
+                        
+                        document.getElementById('timestamp').innerText = `${dateString} · ${timeString}`;
+                        document.getElementById('last-synced').innerText = `Last synced at ${timeString}`;
                     }
                 })
                 .catch(error => console.error('Error fetching data:', error));
         }
 
-        // Run the function immediately when the page loads
+        // Fetch immediately, then loop every 60 seconds
         fetchData();
-
-        // Then, set it to run again every 60,000 milliseconds (60 seconds)
         setInterval(fetchData, 60000);
     </script>
 </body>
