@@ -4,353 +4,257 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Atmosphere Dashboard</title>
-    
-    <script src="https://unpkg.com/lucide@latest"></script>
-
     <style>
-        /* --- MERGED CSS FROM v0 GLOBALS.CSS --- */
+        /* =========================================
+           BRUTALIST CSS STYLING
+           ========================================= */
         :root {
             font-family: Consolas, 'Lucida Console', Monaco, Menlo, 'SF Mono', monospace;
-            color: #f4f1eb;
-            background: #0b0b0a;
+            color: #111;
+            background: #fff;
             font-synthesis: none;
         }
 
         * { box-sizing: border-box; }
-        html { background: #0b0b0a; }
-        body { margin: 0; min-width: 320px; color: #fffdf8; }
+        html, body { margin: 0; min-width: 320px; background: #fff; }
+        body { color: #111; }
 
-        .dashboard-shell {
-            min-height: 100vh;
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(90deg, rgba(8,8,7,.74) 0%, rgba(8,8,7,.32) 49%, rgba(8,8,7,.62) 100%), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/000045940017-Gv5IhFr9zhwowubYwweuxWIipRwGqc.jpg') center / cover fixed;
-        }
-        .dashboard-shell::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(110deg, transparent 0 58%, rgba(255,255,255,.04) 58% 59%, transparent 59%); mix-blend-mode: screen; }
-        .grain { position: absolute; inset: 0; opacity: .08; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E"); mix-blend-mode: soft-light; }
-        .dashboard-content { position: relative; z-index: 1; width: min(1240px, calc(100% - 64px)); margin: auto; padding: 34px 0 28px; }
+        .dashboard-shell { min-height: 100vh; }
+        .dashboard-content { width: min(1080px, calc(100% - 64px)); margin: auto; padding: 32px 0; }
         
-        .topbar, .status-line, .brand-lockup, .hero-row, .hero-meta, .card-topline, .trend-row, .chart-axis, .dashboard-footer, .footer-note { display: flex; align-items: center; }
-        .topbar { justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,.3); padding-bottom: 20px; }
-        .topbar, .dashboard-footer { border-radius: 0 0 16px 16px; }
-        .brand-lockup { gap: 12px; }
-        .brand-mark { display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid rgba(255,255,255,.65); border-radius: 50%; }
+        .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; border-bottom: 1px solid #111; padding-bottom: 18px; }
+        .eyebrow, .status-line, .label, .trend, .location, .footer { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+        .eyebrow, .status-line, .location, .trend, .footer { margin: 0; }
+        .eyebrow { color: #555; }
         
-        .eyebrow, .card-label, .card-index, .status-line, .hero-meta, .trend-row, .chart-axis, .footer-note { font-size: 10px; letter-spacing: .14em; }
-        .eyebrow { color: rgba(255,253,248,.78); margin: 0; text-shadow: 0 1px 10px rgba(0,0,0,.55); }
-        h1 { font-size: 16px; font-weight: 500; letter-spacing: .08em; margin: 4px 0 0; color: #fffdf8; text-shadow: 0 1px 12px rgba(0,0,0,.6); }
-        .status-line { color: rgba(244,241,235,.66); gap: 10px; }
-        .status-dot { width: 7px; height: 7px; background: #90f76a; border-radius: 50%; box-shadow: 0 0 12px #90f76a; }
-        .status-divider { height: 14px; width: 1px; background: rgba(255,255,255,.26); }
+        h1 { font-size: 16px; font-weight: 500; letter-spacing: .08em; margin: 6px 0 0; text-transform: uppercase; }
+        .status-line { color: #555; padding-top: 3px; }
         
-        .hero-row { justify-content: space-between; padding: 64px 0 42px; align-items: end; }
-        h2 { font-size: clamp(38px, 5vw, 67px); line-height: .98; font-weight: 400; letter-spacing: -.065em; margin: 14px 0 0; color: #fffdf8; text-shadow: 0 2px 18px rgba(0,0,0,.65); }
-        h2 em { color: rgba(244,241,235,.57); font-style: normal; }
-        .hero-meta { gap: 8px; color: rgba(244,241,235,.8); flex-wrap: wrap; justify-content: end; max-width: 260px; }
-        .hero-meta-sub { width: 100%; text-align: right; color: rgba(244,241,235,.45); font-size: 10px; letter-spacing: .05em; margin-top: 4px; }
+        .intro { padding: 86px 0 58px; }
+        h2 { font-size: clamp(38px, 6vw, 72px); line-height: 1; font-weight: 400; letter-spacing: -.08em; margin: 14px 0 24px; }
+        .location { color: #555; }
         
-        .readings-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .readings { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #111; border-bottom: 1px solid #111; }
+        .reading { position: relative; min-height: 250px; padding: 20px 18px 18px 0; border-right: 1px solid #111; transition: background 0.3s, border-color 0.3s; }
+        .reading:not(:first-child) { padding-left: 18px; }
+        .reading:last-child { border-right: 0; }
         
-        /* Interactive Cards */
-        .reading-card { position: relative; min-height: 306px; padding: 18px 17px 15px; border-radius: 22px; background: linear-gradient(145deg, rgba(255,255,255,.2), rgba(255,255,255,.07) 48%, rgba(0,0,0,.12)); border: 1px solid rgba(255,255,255,.48); box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 14px 34px rgba(0,0,0,.2); backdrop-filter: blur(13px) saturate(125%); -webkit-backdrop-filter: blur(13px) saturate(125%); transition: transform .25s ease, background .25s ease, box-shadow .25s ease, border-color .25s ease; }
-        .reading-card:hover { transform: translateY(-4px); background: linear-gradient(145deg, rgba(255,255,255,.25), rgba(255,255,255,.1) 48%, rgba(0,0,0,.08)); box-shadow: inset 0 1px 0 rgba(255,255,255,.36), 0 18px 40px rgba(0,0,0,.24); }
+        .label { color: #555; margin: 0; }
+        .value { margin: 32px 0 16px; font-size: clamp(28px, 4vw, 48px); line-height: 1; letter-spacing: -.08em; font-weight: bold; }
+        .unit { color: #c4512a; font-size: 0.5em; vertical-align: super; font-weight: normal; margin-left: 4px; }
+        .trend { color: #555; margin-top: 12px; display: flex; justify-content: space-between; }
         
-        /* DYNAMIC ALERT STATES */
-        .reading-card.alert-warning { background: linear-gradient(145deg, rgba(255,165,0,0.25), rgba(255,165,0,0.08) 48%, rgba(0,0,0,.12)); border-color: rgba(255,165,0,0.6); box-shadow: inset 0 1px 0 rgba(255,165,0,.4), 0 14px 34px rgba(255,165,0,.15); }
-        .reading-card.alert-danger { background: linear-gradient(145deg, rgba(255,50,50,0.25), rgba(255,50,50,0.08) 48%, rgba(0,0,0,.12)); border-color: rgba(255,50,50,0.6); box-shadow: inset 0 1px 0 rgba(255,50,50,.4), 0 14px 34px rgba(255,50,50,.15); }
+        .footer { display: flex; justify-content: space-between; gap: 18px; color: #666; padding-top: 18px; }
+        
+        @media (max-width: 760px) { .dashboard-content { width: min(100% - 32px, 560px); padding-top: 22px; } .status-line { display: none; } .intro { padding: 64px 0 42px; } .readings { grid-template-columns: repeat(2, 1fr); } .reading:nth-child(2) { border-right: 0; } .reading:nth-child(3), .reading:nth-child(4) { border-top: 1px solid #111; } .footer { flex-direction: column; gap: 8px; } }
+        @media (max-width: 480px) { .readings { grid-template-columns: 1fr; } .reading, .reading:not(:first-child) { min-height: 150px; padding: 18px 0; border-right: 0; border-top: 1px solid #111; } .reading:first-child { border-top: 0; } .value { margin: 28px 0 18px; } }
 
-        .card-topline { gap: 10px; color: rgba(244,241,235,.68); }
-        .card-index { color: rgba(244,241,235,.34); }
-        .card-label { flex: 1; }
-        .activity-icon { color: rgba(255,255,255,.48); width: 15px; height: 15px; }
+        /* =========================================
+           INTERACTIVE COMPONENT STYLING 
+           ========================================= */
         
-        .reading-value { display: flex; align-items: baseline; gap: 8px; margin: 35px 0 12px; }
-        .reading-value strong { font-size: clamp(32px, 4vw, 48px); line-height: .9; letter-spacing: -.09em; font-weight: 500; }
-        .reading-value span { font-size: 13px; color: rgba(244,241,235,.6); }
-        
-        .card-orange .reading-value strong, .card-orange .chart-line { color: #ff9b42; stroke: #ff9b42; }
-        .card-cyan .reading-value strong, .card-cyan .chart-line { color: #4ddcff; stroke: #4ddcff; }
-        .card-green .reading-value strong, .card-green .chart-line { color: #9cff57; stroke: #9cff57; }
-        .card-violet .reading-value strong, .card-violet .chart-line { color: #d59cff; stroke: #d59cff; }
-        
-        .trend-row { justify-content: space-between; color: rgba(244,241,235,.4); border-top: 1px solid rgba(255,255,255,.16); padding-top: 11px; }
-        .trend-row b { color: rgba(244,241,235,.75); font-weight: 400; }
-        
-        /* STATIC & INTERACTIVE GRAPH AESTHETICS */
-        .mini-chart { display: block; width: 100%; height: 88px; margin-top: 22px; overflow: visible; }
-        .chart-grid { stroke: rgba(255,255,255,.11); stroke-width: 1; stroke-dasharray: 2 4; }
-        .chart-line { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 5px currentColor); }
-        .chart-dot { fill: currentColor; stroke: #0d0d0c; stroke-width: 2; transition: cy 0.3s ease; }
-        .chart-axis { justify-content: space-between; color: rgba(244,241,235,.33); font-size: 8px; letter-spacing: .05em; margin-top: 3px; }
-        
-        /* HOVER TOOLTIPS & CROSSHAIR */
-        .crosshair { stroke: rgba(255,255,255,0.4); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0; transition: opacity 0.1s; pointer-events: none; }
-        .hover-target { cursor: crosshair; }
-        .chart-tooltip { position: absolute; opacity: 0; background: rgba(0,0,0,0.85); border: 1px solid rgba(255,255,255,0.25); padding: 8px 12px; border-radius: 10px; pointer-events: none; transform: translate(-50%, -120%); text-align: center; z-index: 10; transition: opacity 0.1s ease; box-shadow: 0 4px 16px rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
-        .tooltip-val { font-weight: bold; font-size: 16px; color: #fff; margin-bottom: 3px; letter-spacing: 0; }
-        .tooltip-time { color: #aaa; font-size: 9px; letter-spacing: .05em; }
-
-        /* TIMEFRAME BUTTONS */
+        /* Timeframe Buttons */
         .time-controls { display: flex; gap: 8px; margin-top: 24px; }
-        .time-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: rgba(244,241,235,.5); padding: 6px 14px; border-radius: 12px; font-size: 10px; font-family: inherit; font-weight: bold; letter-spacing: .1em; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(5px); }
-        .time-btn:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.3); }
-        .time-btn.active { background: rgba(255,255,255,0.2); color: #fff; border-color: rgba(255,255,255,0.6); box-shadow: 0 0 10px rgba(255,255,255,0.1); }
+        .time-btn { background: transparent; border: 1px solid #ccc; color: #555; padding: 6px 14px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s; }
+        .time-btn:hover { border-color: #111; color: #111; }
+        .time-btn.active { background: #111; border-color: #111; color: #fff; font-weight: bold; }
 
-        .dashboard-footer { justify-content: space-between; border-top: 1px solid rgba(255,255,255,.22); margin-top: 34px; padding-top: 18px; color: rgba(244,241,235,.48); gap: 18px; }
-        .footer-note { gap: 8px; }
-        .footer-rule { width: 24px; height: 1px; background: rgba(244,241,235,.65); }
-        .footer-location { color: rgba(244,241,235,.3); }
-        
-        @media (max-width: 900px) { .readings-grid { grid-template-columns: repeat(2, 1fr); } .hero-row { padding-top: 48px; } }
-        @media (max-width: 620px) { 
-            .dashboard-content { width: min(100% - 32px, 520px); padding-top: 20px; } 
-            .status-line { display: none; } 
-            .hero-row { display: block; padding: 46px 0 30px; } 
-            .hero-meta { justify-content: start; margin-top: 26px; } 
-            .hero-meta-sub { text-align: left; } 
-            .readings-grid { grid-template-columns: 1fr; } 
-            .reading-card { min-height: 278px; } 
-            .dashboard-footer { align-items: flex-start; flex-direction: column; } 
-            .footer-location { display: none; } 
-        }
-        @media (prefers-reduced-motion: reduce) { .reading-card, .chart-dot, .time-btn { transition: none; } }
+        /* SVG Charts - Stripped down to ink lines */
+        .mini-chart { display: block; width: 100%; height: 60px; overflow: visible; margin-top: 20px;}
+        .chart-grid { stroke: #e0e0e0; stroke-width: 1; stroke-dasharray: 2 4; }
+        .chart-line { fill: none; stroke: #111; stroke-width: 2.5; stroke-linecap: square; stroke-linejoin: miter; }
+        .chart-dot { fill: #fff; stroke: #c4512a; stroke-width: 2.5; transition: cy 0.3s ease; }
+        .chart-axis { display: flex; justify-content: space-between; color: #aaa; font-size: 8px; letter-spacing: .05em; margin-top: 8px; }
+
+        /* Hover Tooltips */
+        .crosshair { stroke: #111; stroke-width: 1; stroke-dasharray: 2 2; opacity: 0; pointer-events: none; }
+        .hover-target { cursor: crosshair; }
+        .chart-tooltip { position: absolute; opacity: 0; background: #111; color: #fff; padding: 6px 10px; pointer-events: none; transform: translate(-50%, -120%); text-align: center; z-index: 10; transition: opacity 0.1s ease; }
+        .tooltip-val { font-weight: bold; font-size: 14px; margin-bottom: 2px; letter-spacing: 0; }
+        .tooltip-time { color: #888; font-size: 8px; letter-spacing: .05em; text-transform: uppercase; }
+
+        /* Dynamic Alerts */
+        .reading.alert-warning { background: #fff3cd; }
+        .reading.alert-danger { background: #fee2e2; }
+        .reading.alert-danger .value, .reading.alert-danger .label, .reading.alert-danger .unit { color: #dc2626; }
+        .reading.alert-danger .chart-line { stroke: #dc2626; }
     </style>
 </head>
 <body>
 
     <main class="dashboard-shell">
-        <div class="grain" aria-hidden="true"></div>
         <div class="dashboard-content">
             
             <header class="topbar">
-                <div class="brand-lockup">
-                    <div class="brand-mark"><i data-lucide="wind" style="width: 18px; height: 18px;"></i></div>
-                    <div>
-                        <p class="eyebrow">FIELD INSTRUMENT / 04</p>
-                        <h1>Atmosphere</h1>
-                    </div>
+                <div>
+                    <p class="eyebrow">FIELD INSTRUMENT / 04</p>
+                    <h1>Atmosphere</h1>
                 </div>
-                <div class="status-line">
-                    <span class="status-dot"></span>
-                    <span>MONITOR ONLINE</span>
-                    <span class="status-divider"></span>
-                    <span id="timestamp">SYNCING...</span>
-                </div>
+                <p class="status-line" id="timestamp">SYNCING...</p>
             </header>
 
-            <section class="hero-row" aria-labelledby="overview-title">
-                <div>
-                    <p class="eyebrow">ENVIRONMENTAL OBSERVATION</p>
-                    <h2 id="overview-title">The air around you,<br /><em>in real time.</em></h2>
-                    
-                    <!-- NEW TIMEFRAME BUTTONS -->
-                    <div class="time-controls">
-                        <button class="time-btn" onclick="setTimeframe(60, this)">1H</button>
-                        <button class="time-btn active" onclick="setTimeframe(360, this)">6H</button>
-                        <button class="time-btn" onclick="setTimeframe(1440, this)">24H</button>
-                        <button class="time-btn" onclick="setTimeframe(10080, this)">7D</button>
-                    </div>
-                </div>
-                <div class="hero-meta">
-                    <i data-lucide="cloud" style="width: 18px; height: 18px;"></i>
-                    <span>WORCESTER / DORM 01</span>
-                    <span class="hero-meta-sub" id="last-synced">Fetching live data...</span>
+            <section class="intro" aria-labelledby="overview-title">
+                <p class="eyebrow">ENVIRONMENTAL OBSERVATION</p>
+                <h2 id="overview-title">The air around you,<br>in real time.</h2>
+                <p class="location" id="last-synced">Fetching live data from WPI Dorm 01...</p>
+                
+                <div class="time-controls">
+                    <button class="time-btn" onclick="setTimeframe(60, this)">1H</button>
+                    <button class="time-btn active" onclick="setTimeframe(360, this)">6H</button>
+                    <button class="time-btn" onclick="setTimeframe(1440, this)">24H</button>
+                    <button class="time-btn" onclick="setTimeframe(10080, this)">7D</button>
                 </div>
             </section>
 
-            <section class="readings-grid" aria-label="Current air quality readings">
+            <section class="readings" aria-label="Current air quality readings">
                 
                 <!-- CARD 1: TEMPERATURE -->
-                <article class="reading-card card-orange" id="card-temp">
-                    <div class="card-topline">
-                        <span class="card-index">01</span>
-                        <span class="card-label">Temperature</span>
-                        <i data-lucide="activity" class="activity-icon"></i>
-                    </div>
-                    <div class="reading-value">
-                        <strong id="val-temp">--</strong>
-                        <span>°F</span>
-                    </div>
-                    <div class="trend-row"><span class="trend-label">6H TREND</span><b id="trend-temp">LIVE</b></div>
+                <article class="reading" id="card-temp">
+                    <p class="label">Temperature</p>
+                    <p class="value"><span id="val-temp">--</span><span class="unit">°F</span></p>
                     
-                    <!-- HTML Tooltip Box -->
                     <div class="chart-tooltip" id="tip-temp">
                         <div class="tooltip-val">--</div>
                         <div class="tooltip-time">--</div>
                     </div>
                     
-                    <svg class="mini-chart" viewBox="0 0 360 88" role="img" preserveAspectRatio="none">
-                        <path class="chart-grid" d="M0 22H360M0 44H360M0 66H360" />
+                    <svg class="mini-chart" viewBox="0 0 360 60" preserveAspectRatio="none">
+                        <path class="chart-grid" d="M0 15H360M0 30H360M0 45H360" />
                         <polyline id="poly-temp" class="chart-line" points="" />
-                        <line id="cross-temp" class="crosshair" x1="0" y1="0" x2="0" y2="88" />
-                        <circle id="dot-temp" class="chart-dot" cx="360" cy="44" r="3.5" opacity="0" />
-                        <!-- Invisible overlay to detect mouse movement -->
-                        <rect class="hover-target" x="0" y="0" width="360" height="88" fill="transparent" 
+                        <line id="cross-temp" class="crosshair" x1="0" y1="0" x2="0" y2="60" />
+                        <circle id="dot-temp" class="chart-dot" cx="360" cy="30" r="3" opacity="0" />
+                        <rect class="hover-target" x="0" y="0" width="360" height="60" fill="transparent" 
                               onmousemove="handleHover(event, 'temp', 'field1', '°F')" 
                               onmouseleave="hideHover('temp')" 
                               ontouchmove="handleHover(event, 'temp', 'field1', '°F')" 
                               ontouchend="hideHover('temp')" />
                     </svg>
                     <div class="chart-axis" id="axis-temp"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
+                    <p class="trend"><span class="trend-label">6H TREND</span> / <b id="trend-temp">LIVE</b></p>
                 </article>
 
                 <!-- CARD 2: HUMIDITY -->
-                <article class="reading-card card-cyan" id="card-hum">
-                    <div class="card-topline">
-                        <span class="card-index">02</span>
-                        <span class="card-label">Humidity</span>
-                        <i data-lucide="activity" class="activity-icon"></i>
-                    </div>
-                    <div class="reading-value">
-                        <strong id="val-hum">--</strong>
-                        <span>%</span>
-                    </div>
-                    <div class="trend-row"><span class="trend-label">6H TREND</span><b id="trend-hum">LIVE</b></div>
+                <article class="reading" id="card-hum">
+                    <p class="label">Humidity</p>
+                    <p class="value"><span id="val-hum">--</span><span class="unit">%</span></p>
                     
                     <div class="chart-tooltip" id="tip-hum">
                         <div class="tooltip-val">--</div>
                         <div class="tooltip-time">--</div>
                     </div>
                     
-                    <svg class="mini-chart" viewBox="0 0 360 88" role="img" preserveAspectRatio="none">
-                        <path class="chart-grid" d="M0 22H360M0 44H360M0 66H360" />
+                    <svg class="mini-chart" viewBox="0 0 360 60" preserveAspectRatio="none">
+                        <path class="chart-grid" d="M0 15H360M0 30H360M0 45H360" />
                         <polyline id="poly-hum" class="chart-line" points="" />
-                        <line id="cross-hum" class="crosshair" x1="0" y1="0" x2="0" y2="88" />
-                        <circle id="dot-hum" class="chart-dot" cx="360" cy="44" r="3.5" opacity="0" />
-                        <rect class="hover-target" x="0" y="0" width="360" height="88" fill="transparent" 
+                        <line id="cross-hum" class="crosshair" x1="0" y1="0" x2="0" y2="60" />
+                        <circle id="dot-hum" class="chart-dot" cx="360" cy="30" r="3" opacity="0" />
+                        <rect class="hover-target" x="0" y="0" width="360" height="60" fill="transparent" 
                               onmousemove="handleHover(event, 'hum', 'field2', '%')" 
-                              onmouseleave="hideHover('hum')"
+                              onmouseleave="hideHover('hum')" 
                               ontouchmove="handleHover(event, 'hum', 'field2', '%')" 
                               ontouchend="hideHover('hum')" />
                     </svg>
                     <div class="chart-axis" id="axis-hum"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
+                    <p class="trend"><span class="trend-label">6H TREND</span> / <b id="trend-hum">LIVE</b></p>
                 </article>
 
                 <!-- CARD 3: PRESSURE -->
-                <article class="reading-card card-green" id="card-pres">
-                    <div class="card-topline">
-                        <span class="card-index">03</span>
-                        <span class="card-label">Pressure</span>
-                        <i data-lucide="activity" class="activity-icon"></i>
-                    </div>
-                    <div class="reading-value">
-                        <strong id="val-pres">--</strong>
-                        <span>hPa</span>
-                    </div>
-                    <div class="trend-row"><span class="trend-label">6H TREND</span><b id="trend-pres">LIVE</b></div>
+                <article class="reading" id="card-pres">
+                    <p class="label">Pressure</p>
+                    <p class="value"><span id="val-pres">--</span><span class="unit">hPa</span></p>
                     
                     <div class="chart-tooltip" id="tip-pres">
                         <div class="tooltip-val">--</div>
                         <div class="tooltip-time">--</div>
                     </div>
-
-                    <svg class="mini-chart" viewBox="0 0 360 88" role="img" preserveAspectRatio="none">
-                        <path class="chart-grid" d="M0 22H360M0 44H360M0 66H360" />
+                    
+                    <svg class="mini-chart" viewBox="0 0 360 60" preserveAspectRatio="none">
+                        <path class="chart-grid" d="M0 15H360M0 30H360M0 45H360" />
                         <polyline id="poly-pres" class="chart-line" points="" />
-                        <line id="cross-pres" class="crosshair" x1="0" y1="0" x2="0" y2="88" />
-                        <circle id="dot-pres" class="chart-dot" cx="360" cy="44" r="3.5" opacity="0" />
-                        <rect class="hover-target" x="0" y="0" width="360" height="88" fill="transparent" 
-                              onmousemove="handleHover(event, 'pres', 'field3', ' hPa')" 
-                              onmouseleave="hideHover('pres')"
-                              ontouchmove="handleHover(event, 'pres', 'field3', ' hPa')" 
+                        <line id="cross-pres" class="crosshair" x1="0" y1="0" x2="0" y2="60" />
+                        <circle id="dot-pres" class="chart-dot" cx="360" cy="30" r="3" opacity="0" />
+                        <rect class="hover-target" x="0" y="0" width="360" height="60" fill="transparent" 
+                              onmousemove="handleHover(event, 'pres', 'field3', 'hPa')" 
+                              onmouseleave="hideHover('pres')" 
+                              ontouchmove="handleHover(event, 'pres', 'field3', 'hPa')" 
                               ontouchend="hideHover('pres')" />
                     </svg>
                     <div class="chart-axis" id="axis-pres"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
+                    <p class="trend"><span class="trend-label">6H TREND</span> / <b id="trend-pres">LIVE</b></p>
                 </article>
 
                 <!-- CARD 4: VOC GAS -->
-                <article class="reading-card card-violet" id="card-voc">
-                    <div class="card-topline">
-                        <span class="card-index">04</span>
-                        <span class="card-label">VOC Gas Status</span>
-                        <i data-lucide="activity" class="activity-icon"></i>
-                    </div>
-                    <div class="reading-value">
-                        <strong id="val-voc">--</strong>
-                        <span id="val-voc-raw">Ohms</span>
-                    </div>
-                    <div class="trend-row"><span class="trend-label">6H TREND</span><b id="trend-voc">LIVE</b></div>
+                <article class="reading" id="card-voc">
+                    <p class="label">VOC Gas Status</p>
+                    <p class="value"><span id="val-voc">--</span><span class="unit" id="val-voc-raw"></span></p>
                     
                     <div class="chart-tooltip" id="tip-voc">
                         <div class="tooltip-val">--</div>
                         <div class="tooltip-time">--</div>
                     </div>
-
-                    <svg class="mini-chart" viewBox="0 0 360 88" role="img" preserveAspectRatio="none">
-                        <path class="chart-grid" d="M0 22H360M0 44H360M0 66H360" />
+                    
+                    <svg class="mini-chart" viewBox="0 0 360 60" preserveAspectRatio="none">
+                        <path class="chart-grid" d="M0 15H360M0 30H360M0 45H360" />
                         <polyline id="poly-voc" class="chart-line" points="" />
-                        <line id="cross-voc" class="crosshair" x1="0" y1="0" x2="0" y2="88" />
-                        <circle id="dot-voc" class="chart-dot" cx="360" cy="44" r="3.5" opacity="0" />
-                        <rect class="hover-target" x="0" y="0" width="360" height="88" fill="transparent" 
-                              onmousemove="handleHover(event, 'voc', 'field4', 'Ohms')" 
-                              onmouseleave="hideHover('voc')"
-                              ontouchmove="handleHover(event, 'voc', 'field4', 'Ohms')" 
+                        <line id="cross-voc" class="crosshair" x1="0" y1="0" x2="0" y2="60" />
+                        <circle id="dot-voc" class="chart-dot" cx="360" cy="30" r="3" opacity="0" />
+                        <rect class="hover-target" x="0" y="0" width="360" height="60" fill="transparent" 
+                              onmousemove="handleHover(event, 'voc', 'field4', 'kΩ')" 
+                              onmouseleave="hideHover('voc')" 
+                              ontouchmove="handleHover(event, 'voc', 'field4', 'kΩ')" 
                               ontouchend="hideHover('voc')" />
                     </svg>
                     <div class="chart-axis" id="axis-voc"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
+                    <p class="trend"><span class="trend-label">6H TREND</span> / <b id="trend-voc">LIVE</b></p>
                 </article>
 
             </section>
 
-            <footer class="dashboard-footer">
-                <div class="footer-note"><span class="footer-rule"></span> <span>DATA WINDOW: LIVE STREAM</span></div>
-                <div class="footer-note"><i data-lucide="refresh-cw" style="width: 13px; height: 13px;"></i> <span>AUTO-REFRESH / 60 SEC</span></div>
-                <div class="footer-note footer-location">LAT 42.2626° N &nbsp; / &nbsp; LONG 71.8023° W</div>
+            <footer class="footer">
+                <span>DATA WINDOW: LIVE STREAM</span>
+                <span>AUTO-REFRESH / 60 SEC</span>
+                <span>LAT 42.2626° N / LONG 71.8023° W</span>
             </footer>
         </div>
     </main>
 
     <!-- LIVE DATA JAVASCRIPT -->
     <script>
-        lucide.createIcons();
-
-        // YOUR THINGSPEAK CREDENTIALS
         const channelID = "3533182"; 
         const readAPIKey = "Z60FSMP5NL35597N";
 
 
-        // Global state
-        let currentMinutes = 360; // Default to 6H
-        let globalFeedData = [];  // Stores the downloaded data for tooltips
+        let currentMinutes = 360; 
+        let globalFeedData = [];  
 
-        // Handles timeframe button clicks
         function setTimeframe(minutes, btnElement) {
             currentMinutes = minutes;
-            
-            // Swap active button styling
             document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
             btnElement.classList.add('active');
             
             document.getElementById('timestamp').innerText = "FETCHING DATA...";
             
-            // Update X-axis labels to match the new timeframe
             let labels = [];
             if(minutes === 60) labels = ['-60M', '-40M', '-20M', 'NOW'];
             else if(minutes === 360) labels = ['-6H', '-4H', '-2H', 'NOW'];
             else if(minutes === 1440) labels = ['-24H', '-16H', '-8H', 'NOW'];
             else labels = ['-7D', '-5D', '-2D', 'NOW'];
             
-            // Update text for all cards
             ['temp', 'hum', 'pres', 'voc'].forEach(id => {
                 const axis = document.getElementById(`axis-${id}`);
                 axis.innerHTML = `<span>${labels[0]}</span><span>${labels[1]}</span><span>${labels[2]}</span><span>${labels[3]}</span>`;
                 
-                // Also update the small Trend label text
                 const labelStr = (minutes === 60) ? "1H" : (minutes === 360) ? "6H" : (minutes === 1440) ? "24H" : "7D";
                 document.querySelector(`#card-${id} .trend-label`).innerText = `${labelStr} TREND`;
             });
 
-            // Fetch new data immediately
             fetchData();
         }
 
-        // Handles the hover crosshair and tooltip math
         function handleHover(event, id, fieldKey, unit) {
             if (!globalFeedData.length) return;
             
-            // Ensure we are working with valid touch or mouse events
             const clientX = event.touches ? event.touches[0].clientX : event.clientX;
-            
             const validData = globalFeedData.filter(d => d[fieldKey] !== null);
             if (!validData.length) return;
 
@@ -359,35 +263,30 @@
             if (percentX < 0) percentX = 0;
             if (percentX > 1) percentX = 1;
 
-            // Map the cursor percentage to the exact data point in the array
             const index = Math.round(percentX * (validData.length - 1));
             const dataPoint = validData[index];
             const val = parseFloat(dataPoint[fieldKey]);
 
-            // Format specific values
             let valStr = val.toFixed(1) + unit;
             if (id === 'pres') valStr = val.toFixed(0) + unit;
-            if (id === 'voc') valStr = (val/1000).toFixed(1) + ' kΩ';
+            if (id === 'voc') valStr = (val/1000).toFixed(1) + unit;
 
             const date = new Date(dataPoint.created_at);
             const timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', month: 'short', day: 'numeric'});
 
-            // Move Crosshair visually inside the SVG (360px wide)
             const crossX = percentX * 360; 
             const crosshair = document.getElementById(`cross-${id}`);
             crosshair.setAttribute('x1', crossX);
             crosshair.setAttribute('x2', crossX);
             crosshair.style.opacity = '1';
 
-            // Populate HTML Tooltip
             const tooltip = document.getElementById(`tip-${id}`);
             tooltip.querySelector('.tooltip-val').innerText = valStr;
             tooltip.querySelector('.tooltip-time').innerText = timeStr;
             
-            // Move HTML Tooltip relative to the card container
             const cardRect = document.getElementById(`card-${id}`).getBoundingClientRect();
             const relativeX = (clientX - cardRect.left);
-            const relativeY = (rect.top - cardRect.top) + 20; // 20px dip into the graph
+            const relativeY = (rect.top - cardRect.top) + 15; 
             
             tooltip.style.left = `${relativeX}px`;
             tooltip.style.top = `${relativeY}px`;
@@ -414,8 +313,8 @@
             const range = max - min || 1; 
 
             const svgWidth = 360;
-            const svgHeight = 88;
-            const padding = 10; 
+            const svgHeight = 60; 
+            const padding = 8; 
             const drawHeight = svgHeight - (padding * 2);
 
             let points = [];
@@ -445,7 +344,6 @@
         }
 
         function fetchData() {
-            // Dynamically inject the active timeframe requested by the user
             const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${readAPIKey}&minutes=${currentMinutes}`;
             
             fetch(url)
@@ -453,22 +351,17 @@
                 .then(data => {
                     const feeds = data.feeds;
                     if(feeds && feeds.length > 0) {
-                        
-                        // Save to global variable so the hover crosshair tool can read it
                         globalFeedData = feeds;
-                        
                         const latest = feeds[feeds.length - 1]; 
                         
-                        // 1. Update large hero numbers
                         document.getElementById('val-temp').innerText = parseFloat(latest.field1).toFixed(1);
                         document.getElementById('val-hum').innerText = parseFloat(latest.field2).toFixed(1);
                         document.getElementById('val-pres').innerText = parseFloat(latest.field3).toFixed(0);
                         
                         const rawGas = parseFloat(latest.field4);
                         document.getElementById('val-voc').innerText = getGasStatus(rawGas);
-                        document.getElementById('val-voc-raw').innerText = `(${(rawGas/1000).toFixed(1)} kΩ)`;
+                        document.getElementById('val-voc-raw').innerText = `${(rawGas/1000).toFixed(1)}kΩ`;
 
-                        // 2. Dynamic Alert Colors
                         const humCard = document.getElementById('card-hum');
                         if (parseFloat(latest.field2) > 65) humCard.classList.add('alert-warning');
                         else humCard.classList.remove('alert-warning');
@@ -477,31 +370,27 @@
                         if (rawGas < 10000) vocCard.classList.add('alert-danger');
                         else vocCard.classList.remove('alert-danger');
 
-                        // 3. Update SVG Graphs
                         updateGraph(feeds, 'field1', 'poly-temp', 'dot-temp');
                         updateGraph(feeds, 'field2', 'poly-hum', 'dot-hum');
                         updateGraph(feeds, 'field3', 'poly-pres', 'dot-pres');
                         updateGraph(feeds, 'field4', 'poly-voc', 'dot-voc');
 
-                        // 4. Update Trend Text
                         document.getElementById('trend-temp').innerText = calculateTrendText(feeds, 'field1', 1.0, '°');
                         document.getElementById('trend-hum').innerText = calculateTrendText(feeds, 'field2', 2.0, '%');
                         document.getElementById('trend-pres').innerText = calculateTrendText(feeds, 'field3', 2.0, '');
                         document.getElementById('trend-voc').innerText = (rawGas - parseFloat(feeds[0].field4) > 5000) ? "IMPROVING" : "STABLE";
 
-                        // 5. Update Timestamps
                         const date = new Date(latest.created_at);
                         const timeString = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                         const dateString = date.toLocaleDateString([], {month: 'short', day: 'numeric', year: 'numeric'}).toUpperCase();
                         
-                        document.getElementById('timestamp').innerText = `${dateString} · ${timeString}`;
-                        document.getElementById('last-synced').innerText = `Last synced at ${timeString}`;
+                        document.getElementById('timestamp').innerText = `MONITOR ONLINE / ${dateString} · ${timeString}`;
+                        document.getElementById('last-synced').innerText = `INDOOR / STUDIO 01 · LAST SYNCED AT ${timeString}`;
                     }
                 })
                 .catch(error => console.error('Error fetching data:', error));
         }
 
-        // Fetch immediately, then loop every 60 seconds
         fetchData();
         setInterval(fetchData, 60000);
     </script>
