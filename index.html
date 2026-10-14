@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dorm Air Quality</title>
+    <style>
+        /* CSS: The Paint and Structure */
+        body {
+            background-color: #121212; /* Dark mode background */
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+
+        #timestamp {
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        /* The Grid layout for our data cards */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* The bubbly, chunky card style */
+        .card {
+            background-color: #1e1e1e;
+            border-radius: 25px; /* Makes the corners very round/bubbly */
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px); /* Gentle hover effect */
+        }
+
+        .card h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.2rem;
+            color: #aaaaaa;
+        }
+
+        .value {
+            font-size: 3rem; /* Huge numbers */
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .unit {
+            font-size: 1.2rem;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Dorm Air Quality</h1>
+    <div id="timestamp">Waiting for data...</div>
+
+    <div class="dashboard">
+        <div class="card">
+            <h2>Temperature</h2>
+            <div class="value" id="temp">--</div>
+            <div class="unit">°F</div>
+        </div>
+        <div class="card">
+            <h2>Humidity</h2>
+            <div class="value" id="hum">--</div>
+            <div class="unit">%</div>
+        </div>
+        <div class="card">
+            <h2>Pressure</h2>
+            <div class="value" id="pres">--</div>
+            <div class="unit">hPa</div>
+        </div>
+        <div class="card">
+            <h2>VOC Status</h2>
+            <div class="value" id="voc">--</div>
+            <div class="unit" id="voc-raw">Ohms</div>
+        </div>
+    </div>
+
+    <script>
+        /* JavaScript: The Muscle that fetches and updates data */
+        
+        // REPLACE THESE TWO VARIABLES WITH YOUR ACTUAL NUMBERS
+        const channelID = "3533182"; 
+        const readAPIKey = "Z60FSMP5NL35597N";
+
+        // The ThingSpeak API URL that asks for just the 1 most recent reading
+        const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${readAPIKey}&results=1`;
+
+        // We recreate your ESP32 Python logic here in JavaScript
+        function getGasStatus(gasOhms) {
+            if (gasOhms > 50000) return "Good";
+            if (gasOhms > 10000) return "Med";
+            return "Bad";
+        }
+
+        function fetchData() {
+            // 'fetch' goes out to the internet, grabs the data, and parses the JSON
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const feed = data.feeds[0]; // Get the newest data point
+                    
+                    if(feed) {
+                        // Update the HTML elements with the new numbers
+                        document.getElementById('temp').innerText = parseFloat(feed.field1).toFixed(1);
+                        document.getElementById('hum').innerText = parseFloat(feed.field2).toFixed(1);
+                        document.getElementById('pres').innerText = parseFloat(feed.field3).toFixed(0);
+                        
+                        // Process the raw gas ohms into Good/Med/Bad
+                        const rawGas = parseFloat(feed.field4);
+                        document.getElementById('voc').innerText = getGasStatus(rawGas);
+                        document.getElementById('voc-raw').innerText = `(${(rawGas/1000).toFixed(1)} kOhm)`;
+
+                        // Format the timestamp nicely
+                        const date = new Date(feed.created_at);
+                        document.getElementById('timestamp').innerText = "Last updated: " + date.toLocaleTimeString();
+                    }
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Run the function immediately when the page loads
+        fetchData();
+
+        // Then, set it to run again every 60,000 milliseconds (60 seconds)
+        setInterval(fetchData, 60000);
+    </script>
+</body>
+</html>
