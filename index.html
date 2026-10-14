@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Atmosphere Dashboard</title>
     
-    <!-- Script to load the Lucide icons used in the v0 design -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
@@ -63,7 +62,6 @@
         .reading-value strong { font-size: clamp(32px, 4vw, 48px); line-height: .9; letter-spacing: -.09em; font-weight: 500; }
         .reading-value span { font-size: 13px; color: rgba(244,241,235,.6); }
         
-        /* Card Colors */
         .card-orange .reading-value strong, .card-orange .chart-line { color: #ff9b42; stroke: #ff9b42; }
         .card-cyan .reading-value strong, .card-cyan .chart-line { color: #4ddcff; stroke: #4ddcff; }
         .card-green .reading-value strong, .card-green .chart-line { color: #9cff57; stroke: #9cff57; }
@@ -72,7 +70,6 @@
         .trend-row { justify-content: space-between; color: rgba(244,241,235,.4); border-top: 1px solid rgba(255,255,255,.16); padding-top: 11px; }
         .trend-row b { color: rgba(244,241,235,.75); font-weight: 400; }
         
-        /* Static Graph Aesthetics */
         .mini-chart { display: block; width: 100%; height: 88px; margin-top: 22px; overflow: visible; }
         .chart-grid { stroke: rgba(255,255,255,.11); stroke-width: 1; stroke-dasharray: 2 4; }
         .chart-line { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 5px currentColor); }
@@ -84,7 +81,6 @@
         .footer-rule { width: 24px; height: 1px; background: rgba(244,241,235,.65); }
         .footer-location { color: rgba(244,241,235,.3); }
         
-        /* Mobile Layout */
         @media (max-width: 900px) { .readings-grid { grid-template-columns: repeat(2, 1fr); } .hero-row { padding-top: 48px; } }
         @media (max-width: 620px) { 
             .dashboard-content { width: min(100% - 32px, 520px); padding-top: 20px; } 
@@ -106,7 +102,6 @@
         <div class="grain" aria-hidden="true"></div>
         <div class="dashboard-content">
             
-            <!-- HEADER -->
             <header class="topbar">
                 <div class="brand-lockup">
                     <div class="brand-mark"><i data-lucide="wind" style="width: 18px; height: 18px;"></i></div>
@@ -123,7 +118,6 @@
                 </div>
             </header>
 
-            <!-- HERO SECTION -->
             <section class="hero-row" aria-labelledby="overview-title">
                 <div>
                     <p class="eyebrow">ENVIRONMENTAL OBSERVATION</p>
@@ -136,7 +130,6 @@
                 </div>
             </section>
 
-            <!-- DATA CARDS GRID -->
             <section class="readings-grid" aria-label="Current air quality readings">
                 
                 <!-- CARD 1: TEMPERATURE -->
@@ -150,13 +143,13 @@
                         <strong id="val-temp">--</strong>
                         <span>°F</span>
                     </div>
-                    <div class="trend-row"><span>24H TREND</span><b>LIVE</b></div>
+                    <div class="trend-row"><span>6H TREND</span><b id="trend-temp">LIVE</b></div>
                     <svg class="mini-chart" viewBox="0 0 360 88" role="img">
                         <path class="chart-grid" d="M0 22H360M0 44H360M0 66H360" />
-                        <polyline class="chart-line" points="0,68 18,62 36,65 54,48 72,53 90,42 108,46 126,34 144,38 162,28 180,35 198,23 216,30 234,20 252,25 270,18 288,24 306,15 324,21 342,12 360,18" />
-                        <circle class="chart-dot" cx="360" cy="18" r="3.5" />
+                        <polyline id="poly-temp" class="chart-line" points="" />
+                        <circle id="dot-temp" class="chart-dot" cx="360" cy="44" r="3.5" opacity="0" />
                     </svg>
-                    <div class="chart-axis"><span>00:00</span><span>06:00</span><span>12:00</span><span>NOW</span></div>
+                    <div class="chart-axis"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
                 </article>
 
                 <!-- CARD 2: HUMIDITY -->
@@ -170,13 +163,13 @@
                         <strong id="val-hum">--</strong>
                         <span>%</span>
                     </div>
-                    <div class="trend-row"><span>24H TREND</span><b>LIVE</b></div>
+                    <div class="trend-row"><span>6H TREND</span><b id="trend-hum">LIVE</b></div>
                     <svg class="mini-chart" viewBox="0 0 360 88" role="img">
                         <path class="chart-grid" d="M0 22H360M0 44H360M0 66H360" />
-                        <polyline class="chart-line" points="0,32 18,35 36,30 54,41 72,38 90,46 108,40 126,51 144,45 162,57 180,49 198,60 216,53 234,66 252,58 270,69 288,63 306,72 324,68 342,77 360,70" />
-                        <circle class="chart-dot" cx="360" cy="70" r="3.5" />
+                        <polyline id="poly-hum" class="chart-line" points="" />
+                        <circle id="dot-hum" class="chart-dot" cx="360" cy="44" r="3.5" opacity="0" />
                     </svg>
-                    <div class="chart-axis"><span>00:00</span><span>06:00</span><span>12:00</span><span>NOW</span></div>
+                    <div class="chart-axis"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
                 </article>
 
                 <!-- CARD 3: PRESSURE -->
@@ -190,13 +183,13 @@
                         <strong id="val-pres">--</strong>
                         <span>hPa</span>
                     </div>
-                    <div class="trend-row"><span>24H TREND</span><b>LIVE</b></div>
+                    <div class="trend-row"><span>6H TREND</span><b id="trend-pres">LIVE</b></div>
                     <svg class="mini-chart" viewBox="0 0 360 88" role="img">
                         <path class="chart-grid" d="M0 22H360M0 44H360M0 66H360" />
-                        <polyline class="chart-line" points="0,58 18,55 36,57 54,52 72,54 90,48 108,50 126,45 144,48 162,43 180,44 198,40 216,43 234,37 252,40 270,35 288,38 306,32 324,34 342,30 360,32" />
-                        <circle class="chart-dot" cx="360" cy="32" r="3.5" />
+                        <polyline id="poly-pres" class="chart-line" points="" />
+                        <circle id="dot-pres" class="chart-dot" cx="360" cy="44" r="3.5" opacity="0" />
                     </svg>
-                    <div class="chart-axis"><span>00:00</span><span>06:00</span><span>12:00</span><span>NOW</span></div>
+                    <div class="chart-axis"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
                 </article>
 
                 <!-- CARD 4: VOC GAS -->
@@ -210,18 +203,17 @@
                         <strong id="val-voc">--</strong>
                         <span id="val-voc-raw">Ohms</span>
                     </div>
-                    <div class="trend-row"><span>24H TREND</span><b>LIVE</b></div>
+                    <div class="trend-row"><span>6H TREND</span><b id="trend-voc">LIVE</b></div>
                     <svg class="mini-chart" viewBox="0 0 360 88" role="img">
                         <path class="chart-grid" d="M0 22H360M0 44H360M0 66H360" />
-                        <polyline class="chart-line" points="0,52 18,50 36,52 54,48 72,51 90,47 108,49 126,46 144,48 162,44 180,46 198,43 216,45 234,42 252,44 270,40 288,42 306,39 324,41 342,38 360,40" />
-                        <circle class="chart-dot" cx="360" cy="40" r="3.5" />
+                        <polyline id="poly-voc" class="chart-line" points="" />
+                        <circle id="dot-voc" class="chart-dot" cx="360" cy="44" r="3.5" opacity="0" />
                     </svg>
-                    <div class="chart-axis"><span>00:00</span><span>06:00</span><span>12:00</span><span>NOW</span></div>
+                    <div class="chart-axis"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
                 </article>
 
             </section>
 
-            <!-- FOOTER -->
             <footer class="dashboard-footer">
                 <div class="footer-note"><span class="footer-rule"></span> <span>DATA WINDOW: LIVE STREAM</span></div>
                 <div class="footer-note"><i data-lucide="refresh-cw" style="width: 13px; height: 13px;"></i> <span>AUTO-REFRESH / 60 SEC</span></div>
@@ -232,14 +224,14 @@
 
     <!-- LIVE DATA JAVASCRIPT -->
     <script>
-        // 1. Initialize the SVG Icons
         lucide.createIcons();
 
-        // 2. YOUR THINGSPEAK CREDENTIALS - UPDATE THESE!
+        // YOUR THINGSPEAK CREDENTIALS
         const channelID = "3533182"; 
         const readAPIKey = "Z60FSMP5NL35597N";
 
-        const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${readAPIKey}&results=1`;
+        // Changed to fetch the last 360 minutes (6 hours) of data
+        const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${readAPIKey}&minutes=360`;
 
         function getGasStatus(gasOhms) {
             if (gasOhms > 50000) return "GOOD";
@@ -247,24 +239,84 @@
             return "POOR";
         }
 
+        // SVG Graph Generator Math
+        function updateGraph(feedData, fieldKey, polyId, dotId) {
+            // Filter out null entries
+            const validData = feedData.filter(d => d[fieldKey] !== null).map(d => parseFloat(d[fieldKey]));
+            if (validData.length === 0) return;
+
+            const min = Math.min(...validData);
+            const max = Math.max(...validData);
+            const range = max - min || 1; // Avoid divide by zero if data is perfectly flat
+
+            const svgWidth = 360;
+            const svgHeight = 88;
+            const padding = 10; // Keep the line from hitting the absolute top/bottom borders
+            const drawHeight = svgHeight - (padding * 2);
+
+            let points = [];
+            const stepX = svgWidth / Math.max(validData.length - 1, 1);
+
+            validData.forEach((val, index) => {
+                const x = index * stepX;
+                // SVG Y=0 is at the top, so we invert the Y coordinate math
+                const y = padding + drawHeight - (((val - min) / range) * drawHeight);
+                points.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+            });
+
+            // Apply points to the polyline
+            document.getElementById(polyId).setAttribute('points', points.join(' '));
+            
+            // Move the glowing dot to the very last point
+            const finalY = points[points.length - 1].split(',')[1];
+            const dot = document.getElementById(dotId);
+            dot.setAttribute('cy', finalY);
+            dot.setAttribute('opacity', '1'); // Make it visible once data loads
+        }
+
+        function calculateTrendText(feedData, fieldKey, threshold, unit) {
+            const validData = feedData.filter(d => d[fieldKey] !== null).map(d => parseFloat(d[fieldKey]));
+            if (validData.length < 10) return "FLAT";
+            
+            const firstReading = validData[0];
+            const lastReading = validData[validData.length - 1];
+            const diff = lastReading - firstReading;
+            
+            if (Math.abs(diff) < threshold) return "FLAT";
+            return (diff > 0 ? "+" : "") + diff.toFixed(1) + unit;
+        }
+
         function fetchData() {
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    const feed = data.feeds[0];
-                    
-                    if(feed) {
-                        // Inject live data into the HTML elements by their IDs
-                        document.getElementById('val-temp').innerText = parseFloat(feed.field1).toFixed(1);
-                        document.getElementById('val-hum').innerText = parseFloat(feed.field2).toFixed(1);
-                        document.getElementById('val-pres').innerText = parseFloat(feed.field3).toFixed(0);
+                    const feeds = data.feeds;
+                    if(feeds && feeds.length > 0) {
+                        const latest = feeds[feeds.length - 1]; // The most recent reading
                         
-                        const rawGas = parseFloat(feed.field4);
+                        // 1. Update large hero numbers
+                        document.getElementById('val-temp').innerText = parseFloat(latest.field1).toFixed(1);
+                        document.getElementById('val-hum').innerText = parseFloat(latest.field2).toFixed(1);
+                        document.getElementById('val-pres').innerText = parseFloat(latest.field3).toFixed(0);
+                        
+                        const rawGas = parseFloat(latest.field4);
                         document.getElementById('val-voc').innerText = getGasStatus(rawGas);
                         document.getElementById('val-voc-raw').innerText = `(${(rawGas/1000).toFixed(1)} kΩ)`;
 
-                        // Update timestamps
-                        const date = new Date(feed.created_at);
+                        // 2. Update the SVGs graphs using the full 6-hour history
+                        updateGraph(feeds, 'field1', 'poly-temp', 'dot-temp');
+                        updateGraph(feeds, 'field2', 'poly-hum', 'dot-hum');
+                        updateGraph(feeds, 'field3', 'poly-pres', 'dot-pres');
+                        updateGraph(feeds, 'field4', 'poly-voc', 'dot-voc');
+
+                        // 3. Update the 6H Trend math text
+                        document.getElementById('trend-temp').innerText = calculateTrendText(feeds, 'field1', 1.0, '°');
+                        document.getElementById('trend-hum').innerText = calculateTrendText(feeds, 'field2', 2.0, '%');
+                        document.getElementById('trend-pres').innerText = calculateTrendText(feeds, 'field3', 2.0, '');
+                        document.getElementById('trend-voc').innerText = (rawGas - parseFloat(feeds[0].field4) > 5000) ? "IMPROVING" : "STABLE";
+
+                        // 4. Update timestamps
+                        const date = new Date(latest.created_at);
                         const timeString = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                         const dateString = date.toLocaleDateString([], {month: 'short', day: 'numeric', year: 'numeric'}).toUpperCase();
                         
@@ -275,7 +327,6 @@
                 .catch(error => console.error('Error fetching data:', error));
         }
 
-        // Fetch immediately, then loop every 60 seconds
         fetchData();
         setInterval(fetchData, 60000);
     </script>
