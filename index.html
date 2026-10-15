@@ -5,98 +5,245 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Atmosphere Dashboard</title>
     <style>
-        /* =========================================
-           BRUTALIST CSS STYLING
-           ========================================= */
         :root {
             font-family: Consolas, 'Lucida Console', Monaco, Menlo, 'SF Mono', monospace;
             color: #111;
-            background: #fff;
+            background: #f7f6f2;
             font-synthesis: none;
         }
 
         * { box-sizing: border-box; }
-        html, body { margin: 0; min-width: 320px; background: #fff; }
-        body { color: #111; }
+        html, body {
+            margin: 0;
+            min-width: 320px;
+            min-height: 100vh;
+            color: #111;
+            overflow-x: hidden;
+        }
 
-        .dashboard-shell { min-height: 100vh; }
-        .dashboard-content { width: min(1080px, calc(100% - 64px)); margin: auto; padding: 32px 0; }
-        
-        .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; border-bottom: 1px solid #111; padding-bottom: 18px; }
-        .eyebrow, .status-line, .label, .trend, .location, .footer { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
-        .eyebrow, .status-line, .location, .trend, .footer { margin: 0; }
-        .eyebrow { color: #555; }
-        
-        h1 { font-size: 16px; font-weight: 500; letter-spacing: .08em; margin: 6px 0 0; text-transform: uppercase; }
-        .status-line { color: #555; padding-top: 3px; }
-        
-        .intro { padding: 86px 0 58px; }
-        h2 { font-size: clamp(38px, 6vw, 72px); line-height: 1; font-weight: 400; letter-spacing: -.08em; margin: 14px 0 24px; }
-        .location { color: #555; }
-        
-        .readings { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #111; border-bottom: 1px solid #111; }
-        .reading { position: relative; min-height: 250px; padding: 20px 18px 18px 0; border-right: 1px solid #111; transition: background 0.3s, border-color 0.3s; }
-        .reading:not(:first-child) { padding-left: 18px; }
-        .reading:last-child { border-right: 0; }
-        
-        .label { color: #555; margin: 0; }
-        .value { margin: 32px 0 16px; font-size: clamp(28px, 4vw, 48px); line-height: 1; letter-spacing: -.08em; font-weight: bold; }
-        .unit { color: #c4512a; font-size: 0.5em; vertical-align: super; font-weight: normal; margin-left: 4px; }
-        .trend { color: #555; margin-top: 12px; display: flex; justify-content: space-between; }
-        
-        .footer { display: flex; justify-content: space-between; gap: 18px; color: #666; padding-top: 18px; }
-        
-        @media (max-width: 760px) { .dashboard-content { width: min(100% - 32px, 560px); padding-top: 22px; } .status-line { display: none; } .intro { padding: 64px 0 42px; } .readings { grid-template-columns: repeat(2, 1fr); } .reading:nth-child(2) { border-right: 0; } .reading:nth-child(3), .reading:nth-child(4) { border-top: 1px solid #111; } .footer { flex-direction: column; gap: 8px; } }
-        @media (max-width: 480px) { .readings { grid-template-columns: 1fr; } .reading, .reading:not(:first-child) { min-height: 150px; padding: 18px 0; border-right: 0; border-top: 1px solid #111; } .reading:first-child { border-top: 0; } .value { margin: 28px 0 18px; } }
+        /* Black and White Photo Background */
+        .bg-layer {
+            position: fixed;
+            inset: 0;
+            background-image: url('./assets/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: 0;
+        }
 
-        /* =========================================
-           INTERACTIVE COMPONENT STYLING 
-           ========================================= */
-        
-        /* Timeframe Buttons */
-        .time-controls { display: flex; gap: 8px; margin-top: 24px; }
-        .time-btn { background: transparent; border: 1px solid #ccc; color: #555; padding: 6px 14px; font-size: 10px; font-family: inherit; cursor: pointer; transition: all 0.2s; }
-        .time-btn:hover { border-color: #111; color: #111; }
+        /* Light Airy Wash Over Photo */
+        .bg-wash {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.58) 0%,
+                rgba(255, 255, 255, 0.38) 55%,
+                rgba(255, 255, 255, 0.48) 100%
+            );
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Randomly Scattered Leaves Overlay */
+        .leaves-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        .floating-leaf {
+            position: absolute;
+            user-select: none;
+            pointer-events: none;
+            filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.14));
+            opacity: 0.94;
+        }
+
+        .dashboard-shell {
+            position: relative;
+            z-index: 5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .dashboard-content {
+            width: min(1080px, calc(100% - 64px));
+            margin: auto;
+            padding: 48px 0;
+        }
+
+        .label, .trend, .location {
+            font-size: 11px;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .intro {
+            padding: 24px 0 42px;
+        }
+
+        .intro-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        h2 {
+            font-size: clamp(38px, 6vw, 72px);
+            line-height: 1.02;
+            font-weight: 400;
+            letter-spacing: -.06em;
+            margin: 0;
+        }
+
+        .location {
+            color: #222;
+            line-height: 1.6;
+            padding-bottom: 6px;
+        }
+
+        /* Airy Translucent Cards */
+        .readings {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+
+        .reading {
+            position: relative;
+            min-height: 255px;
+            padding: 22px 20px 18px;
+            border: 1px solid rgba(17, 17, 17, 0.65);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.42);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .reading:hover {
+            background: rgba(255, 255, 255, 0.58);
+        }
+
+        .label {
+            color: #111;
+            font-size: 15px;
+            letter-spacing: -.02em;
+            text-transform: none;
+        }
+
+        .value {
+            margin: 18px 0 22px;
+            font-size: clamp(28px, 3.6vw, 44px);
+            line-height: 1;
+            letter-spacing: -.06em;
+            font-weight: 500;
+        }
+
+        .unit {
+            color: #111;
+            font-size: 0.65em;
+            font-weight: normal;
+            margin-left: 6px;
+        }
+
+        .trend {
+            color: #333;
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @media (max-width: 820px) {
+            .dashboard-content { width: min(100% - 32px, 600px); padding: 32px 0; }
+            .readings { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 480px) {
+            .readings { grid-template-columns: 1fr; }
+            .reading { min-height: 210px; }
+        }
+
+        /* Timeframe Controls */
+        .time-controls { display: flex; gap: 8px; margin-top: 22px; }
+        .time-btn {
+            background: rgba(255, 255, 255, 0.55);
+            border: 1px solid #111;
+            border-radius: 5px;
+            color: #111;
+            padding: 7px 15px;
+            font-size: 11px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .time-btn:hover { background: rgba(255, 255, 255, 0.85); }
         .time-btn.active { background: #111; border-color: #111; color: #fff; font-weight: bold; }
 
-        /* SVG Charts - Stripped down to ink lines */
-        .mini-chart { display: block; width: 100%; height: 60px; overflow: visible; margin-top: 20px;}
-        .chart-grid { stroke: #e0e0e0; stroke-width: 1; stroke-dasharray: 2 4; }
-        .chart-line { fill: none; stroke: #111; stroke-width: 2.5; stroke-linecap: square; stroke-linejoin: miter; }
-        .chart-dot { fill: #fff; stroke: #c4512a; stroke-width: 2.5; transition: cy 0.3s ease; }
-        .chart-axis { display: flex; justify-content: space-between; color: #aaa; font-size: 8px; letter-spacing: .05em; margin-top: 8px; }
+        /* SVG Charts */
+        .mini-chart { display: block; width: 100%; height: 68px; overflow: visible; margin-top: 14px; }
+        .chart-grid { stroke: rgba(17, 17, 17, 0.22); stroke-width: 1; stroke-dasharray: 2 3; }
+        .chart-line { fill: none; stroke: #111; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+        .chart-dot { fill: #111; stroke: #fff; stroke-width: 1.5; transition: cy 0.3s ease; }
+        .chart-axis {
+            display: flex;
+            justify-content: space-between;
+            color: #222;
+            font-size: 10px;
+            letter-spacing: .04em;
+            margin-top: 10px;
+            border-top: 1px solid rgba(17, 17, 17, 0.25);
+            padding-top: 8px;
+        }
 
         /* Hover Tooltips */
         .crosshair { stroke: #111; stroke-width: 1; stroke-dasharray: 2 2; opacity: 0; pointer-events: none; }
         .hover-target { cursor: crosshair; }
-        .chart-tooltip { position: absolute; opacity: 0; background: #111; color: #fff; padding: 6px 10px; pointer-events: none; transform: translate(-50%, -120%); text-align: center; z-index: 10; transition: opacity 0.1s ease; }
-        .tooltip-val { font-weight: bold; font-size: 14px; margin-bottom: 2px; letter-spacing: 0; }
-        .tooltip-time { color: #888; font-size: 8px; letter-spacing: .05em; text-transform: uppercase; }
+        .chart-tooltip {
+            position: absolute;
+            opacity: 0;
+            background: #111;
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 4px;
+            pointer-events: none;
+            transform: translate(-50%, -120%);
+            text-align: center;
+            z-index: 20;
+            transition: opacity 0.1s ease;
+        }
+        .tooltip-val { font-weight: bold; font-size: 13px; margin-bottom: 2px; }
+        .tooltip-time { color: #bbb; font-size: 8px; letter-spacing: .05em; text-transform: uppercase; }
 
         /* Dynamic Alerts */
-        .reading.alert-warning { background: #fff3cd; }
-        .reading.alert-danger { background: #fee2e2; }
+        .reading.alert-warning { background: rgba(255, 243, 205, 0.65); }
+        .reading.alert-danger { background: rgba(254, 226, 226, 0.72); }
         .reading.alert-danger .value, .reading.alert-danger .label, .reading.alert-danger .unit { color: #dc2626; }
         .reading.alert-danger .chart-line { stroke: #dc2626; }
     </style>
 </head>
 <body>
 
+    <div class="bg-layer" aria-hidden="true"></div>
+    <div class="bg-wash" aria-hidden="true"></div>
+    <div class="leaves-layer" id="leaves-container" aria-hidden="true"></div>
+
     <main class="dashboard-shell">
         <div class="dashboard-content">
-            
-            <header class="topbar">
-                <div>
-                    <p class="eyebrow">FIELD INSTRUMENT / 04</p>
-                    <h1>Atmosphere</h1>
-                </div>
-                <p class="status-line" id="timestamp">SYNCING...</p>
-            </header>
 
             <section class="intro" aria-labelledby="overview-title">
-                <p class="eyebrow">ENVIRONMENTAL OBSERVATION</p>
-                <h2 id="overview-title">The air around you,<br>in real time.</h2>
-                <p class="location" id="last-synced">Fetching live data from WPI Dorm 01...</p>
+                <div class="intro-header">
+                    <h2 id="overview-title">The air around you,<br>in real time.</h2>
+                    <p class="location" id="last-synced">INDOOR<br>STUDIO 01 · SYNCING LIVE DATA...</p>
+                </div>
                 
                 <div class="time-controls">
                     <button class="time-btn" onclick="setTimeframe(60, this)">1H</button>
@@ -112,6 +259,7 @@
                 <article class="reading" id="card-temp">
                     <p class="label">Temperature</p>
                     <p class="value"><span id="val-temp">--</span><span class="unit">°F</span></p>
+                    <p class="trend"><span class="trend-label">6H TREND</span> <b id="trend-temp">LIVE</b></p>
                     
                     <div class="chart-tooltip" id="tip-temp">
                         <div class="tooltip-val">--</div>
@@ -119,7 +267,7 @@
                     </div>
                     
                     <svg class="mini-chart" viewBox="0 0 360 60" preserveAspectRatio="none">
-                        <path class="chart-grid" d="M0 15H360M0 30H360M0 45H360" />
+                        <path class="chart-grid" d="M0 15H360M0 30H360M0 45H360 M72 0V60 M144 0V60 M216 0V60 M288 0V60" />
                         <polyline id="poly-temp" class="chart-line" points="" />
                         <line id="cross-temp" class="crosshair" x1="0" y1="0" x2="0" y2="60" />
                         <circle id="dot-temp" class="chart-dot" cx="360" cy="30" r="3" opacity="0" />
@@ -130,13 +278,13 @@
                               ontouchend="hideHover('temp')" />
                     </svg>
                     <div class="chart-axis" id="axis-temp"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
-                    <p class="trend"><span class="trend-label">6H TREND</span> / <b id="trend-temp">LIVE</b></p>
                 </article>
 
                 <!-- CARD 2: HUMIDITY -->
                 <article class="reading" id="card-hum">
                     <p class="label">Humidity</p>
                     <p class="value"><span id="val-hum">--</span><span class="unit">%</span></p>
+                    <p class="trend"><span class="trend-label">6H TREND</span> <b id="trend-hum">LIVE</b></p>
                     
                     <div class="chart-tooltip" id="tip-hum">
                         <div class="tooltip-val">--</div>
@@ -144,7 +292,7 @@
                     </div>
                     
                     <svg class="mini-chart" viewBox="0 0 360 60" preserveAspectRatio="none">
-                        <path class="chart-grid" d="M0 15H360M0 30H360M0 45H360" />
+                        <path class="chart-grid" d="M0 15H360M0 30H360M0 45H360 M72 0V60 M144 0V60 M216 0V60 M288 0V60" />
                         <polyline id="poly-hum" class="chart-line" points="" />
                         <line id="cross-hum" class="crosshair" x1="0" y1="0" x2="0" y2="60" />
                         <circle id="dot-hum" class="chart-dot" cx="360" cy="30" r="3" opacity="0" />
@@ -155,13 +303,13 @@
                               ontouchend="hideHover('hum')" />
                     </svg>
                     <div class="chart-axis" id="axis-hum"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
-                    <p class="trend"><span class="trend-label">6H TREND</span> / <b id="trend-hum">LIVE</b></p>
                 </article>
 
                 <!-- CARD 3: PRESSURE -->
                 <article class="reading" id="card-pres">
                     <p class="label">Pressure</p>
                     <p class="value"><span id="val-pres">--</span><span class="unit">hPa</span></p>
+                    <p class="trend"><span class="trend-label">6H TREND</span> <b id="trend-pres">LIVE</b></p>
                     
                     <div class="chart-tooltip" id="tip-pres">
                         <div class="tooltip-val">--</div>
@@ -169,7 +317,7 @@
                     </div>
                     
                     <svg class="mini-chart" viewBox="0 0 360 60" preserveAspectRatio="none">
-                        <path class="chart-grid" d="M0 15H360M0 30H360M0 45H360" />
+                        <path class="chart-grid" d="M0 15H360M0 30H360M0 45H360 M72 0V60 M144 0V60 M216 0V60 M288 0V60" />
                         <polyline id="poly-pres" class="chart-line" points="" />
                         <line id="cross-pres" class="crosshair" x1="0" y1="0" x2="0" y2="60" />
                         <circle id="dot-pres" class="chart-dot" cx="360" cy="30" r="3" opacity="0" />
@@ -180,13 +328,13 @@
                               ontouchend="hideHover('pres')" />
                     </svg>
                     <div class="chart-axis" id="axis-pres"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
-                    <p class="trend"><span class="trend-label">6H TREND</span> / <b id="trend-pres">LIVE</b></p>
                 </article>
 
                 <!-- CARD 4: VOC GAS -->
                 <article class="reading" id="card-voc">
                     <p class="label">VOC Gas Status</p>
                     <p class="value"><span id="val-voc">--</span><span class="unit" id="val-voc-raw"></span></p>
+                    <p class="trend"><span class="trend-label">6H TREND</span> <b id="trend-voc">LIVE</b></p>
                     
                     <div class="chart-tooltip" id="tip-voc">
                         <div class="tooltip-val">--</div>
@@ -194,7 +342,7 @@
                     </div>
                     
                     <svg class="mini-chart" viewBox="0 0 360 60" preserveAspectRatio="none">
-                        <path class="chart-grid" d="M0 15H360M0 30H360M0 45H360" />
+                        <path class="chart-grid" d="M0 15H360M0 30H360M0 45H360 M72 0V60 M144 0V60 M216 0V60 M288 0V60" />
                         <polyline id="poly-voc" class="chart-line" points="" />
                         <line id="cross-voc" class="crosshair" x1="0" y1="0" x2="0" y2="60" />
                         <circle id="dot-voc" class="chart-dot" cx="360" cy="30" r="3" opacity="0" />
@@ -205,24 +353,56 @@
                               ontouchend="hideHover('voc')" />
                     </svg>
                     <div class="chart-axis" id="axis-voc"><span>-6H</span><span>-4H</span><span>-2H</span><span>NOW</span></div>
-                    <p class="trend"><span class="trend-label">6H TREND</span> / <b id="trend-voc">LIVE</b></p>
                 </article>
 
             </section>
-
-            <footer class="footer">
-                <span>DATA WINDOW: LIVE STREAM</span>
-                <span>AUTO-REFRESH / 60 SEC</span>
-                <span>LAT 42.2626° N / LONG 71.8023° W</span>
-            </footer>
         </div>
     </main>
 
-    <!-- LIVE DATA JAVASCRIPT -->
     <script>
+        const leafSprites = [
+            "./assets/leaf-1.png",
+            "./assets/leaf-2.png",
+            "./assets/leaf-3.png",
+            "./assets/leaf-4.png"
+        ];
+
+        function scatterLeaves() {
+            const container = document.getElementById('leaves-container');
+            container.innerHTML = '';
+
+            const zones = [
+                { topMin: 4,  topMax: 18, leftMin: -3, leftMax: 6,  sizeMin: 130, sizeMax: 175 },
+                { topMin: 68, topMax: 84, leftMin: -4, leftMax: 5,  sizeMin: 135, sizeMax: 185 },
+                { topMin: 36, topMax: 48, leftMin: 40, leftMax: 49, sizeMin: 115, sizeMax: 150 },
+                { topMin: 24, topMax: 38, leftMin: 91, leftMax: 96, sizeMin: 135, sizeMax: 175 },
+                { topMin: 72, topMax: 86, leftMin: 90, leftMax: 95, sizeMin: 140, sizeMax: 185 },
+                { topMin: 88, topMax: 94, leftMin: 54, leftMax: 66, sizeMin: 125, sizeMax: 165 }
+            ];
+
+            zones.forEach((z, idx) => {
+                const img = document.createElement('img');
+                img.src = leafSprites[idx % leafSprites.length];
+                img.className = 'floating-leaf';
+
+                const top = z.topMin + Math.random() * (z.topMax - z.topMin);
+                const left = z.leftMin + Math.random() * (z.leftMax - z.leftMin);
+                const size = z.sizeMin + Math.random() * (z.sizeMax - z.sizeMin);
+                const rot = Math.round(Math.random() * 360);
+
+                img.style.top = `${top.toFixed(1)}%`;
+                img.style.left = `${left.toFixed(1)}%`;
+                img.style.width = `${Math.round(size)}px`;
+                img.style.transform = `rotate(${rot}deg)`;
+
+                container.appendChild(img);
+            });
+        }
+
+        scatterLeaves();
+
         const channelID = "3533182"; 
         const readAPIKey = "Z60FSMP5NL35597N";
-
 
         let currentMinutes = 360; 
         let globalFeedData = [];  
@@ -231,8 +411,6 @@
             currentMinutes = minutes;
             document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
             btnElement.classList.add('active');
-            
-            document.getElementById('timestamp').innerText = "FETCHING DATA...";
             
             let labels = [];
             if(minutes === 60) labels = ['-60M', '-40M', '-20M', 'NOW'];
@@ -382,10 +560,8 @@
 
                         const date = new Date(latest.created_at);
                         const timeString = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                        const dateString = date.toLocaleDateString([], {month: 'short', day: 'numeric', year: 'numeric'}).toUpperCase();
                         
-                        document.getElementById('timestamp').innerText = `MONITOR ONLINE / ${dateString} · ${timeString}`;
-                        document.getElementById('last-synced').innerText = `INDOOR / STUDIO 01 · LAST SYNCED AT ${timeString}`;
+                        document.getElementById('last-synced').innerHTML = `INDOOR<br>STUDIO 01 · LAST SYNCED AT ${timeString}`;
                     }
                 })
                 .catch(error => console.error('Error fetching data:', error));
