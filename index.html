@@ -8,50 +8,48 @@
         :root {
             font-family: Consolas, 'Lucida Console', Monaco, Menlo, 'SF Mono', monospace;
             color: #111;
-            background: #f7f6f2;
             font-synthesis: none;
         }
 
         * { box-sizing: border-box; }
+
         html, body {
             margin: 0;
+            padding: 0;
             min-width: 320px;
             min-height: 100vh;
             color: #111;
+            position: relative;
             overflow-x: hidden;
+            background-color: #f7f6f2;
         }
 
-        /* Black and White Photo Background */
-        .bg-layer {
+        /* Fixed Background Photo with Airy Gradient Wash */
+        .bg-fixed {
             position: fixed;
-            inset: 0;
-            background-image: url('./assets/background.jpg');
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(180deg, rgba(255, 255, 255, 0.58) 0%, rgba(255, 255, 255, 0.38) 55%, rgba(255, 255, 255, 0.48) 100%),
+                url('assets/background.jpg');
             background-size: cover;
-            background-position: center;
+            background-position: center center;
             background-repeat: no-repeat;
-            z-index: 0;
-        }
-
-        /* Light Airy Wash Over Photo */
-        .bg-wash {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(
-                180deg,
-                rgba(255, 255, 255, 0.58) 0%,
-                rgba(255, 255, 255, 0.38) 55%,
-                rgba(255, 255, 255, 0.48) 100%
-            );
             z-index: 1;
             pointer-events: none;
         }
 
-        /* Randomly Scattered Leaves Overlay */
+        /* Scrollable Leaves Layer: Moves with Content on Desktop & Mobile */
         .leaves-layer {
-            position: fixed;
-            inset: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 4;
             pointer-events: none;
-            z-index: 10;
             overflow: hidden;
         }
 
@@ -63,9 +61,10 @@
             opacity: 0.94;
         }
 
+        /* Content Shell */
         .dashboard-shell {
             position: relative;
-            z-index: 5;
+            z-index: 3;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -111,7 +110,7 @@
             padding-bottom: 6px;
         }
 
-        /* Airy Translucent Cards */
+        /* Translucent Glassmorphic Cards */
         .readings {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -232,8 +231,10 @@
 </head>
 <body>
 
-    <div class="bg-layer" aria-hidden="true"></div>
-    <div class="bg-wash" aria-hidden="true"></div>
+    <!-- Fixed Background Image + Light Wash Layer -->
+    <div class="bg-fixed" aria-hidden="true"></div>
+
+    <!-- Scrollable Scattered Leaves Layer (moves with page content) -->
     <div class="leaves-layer" id="leaves-container" aria-hidden="true"></div>
 
     <main class="dashboard-shell">
@@ -361,23 +362,24 @@
 
     <script>
         const leafSprites = [
-            "./assets/leaf-1.png",
-            "./assets/leaf-2.png",
-            "./assets/leaf-3.png",
-            "./assets/leaf-4.png"
+            "assets/leaf-1.png",
+            "assets/leaf-2.png",
+            "assets/leaf-3.png",
+            "assets/leaf-4.png"
         ];
 
         function scatterLeaves() {
             const container = document.getElementById('leaves-container');
             container.innerHTML = '';
 
+            // Distributed along the entire page height so they scroll with the content
             const zones = [
-                { topMin: 4,  topMax: 18, leftMin: -3, leftMax: 6,  sizeMin: 130, sizeMax: 175 },
-                { topMin: 68, topMax: 84, leftMin: -4, leftMax: 5,  sizeMin: 135, sizeMax: 185 },
-                { topMin: 36, topMax: 48, leftMin: 40, leftMax: 49, sizeMin: 115, sizeMax: 150 },
-                { topMin: 24, topMax: 38, leftMin: 91, leftMax: 96, sizeMin: 135, sizeMax: 175 },
-                { topMin: 72, topMax: 86, leftMin: 90, leftMax: 95, sizeMin: 140, sizeMax: 185 },
-                { topMin: 88, topMax: 94, leftMin: 54, leftMax: 66, sizeMin: 125, sizeMax: 165 }
+                { topMin: 4,  topMax: 16, leftMin: -2, leftMax: 6,  sizeMin: 125, sizeMax: 165 },
+                { topMin: 22, topMax: 34, leftMin: 88, leftMax: 95, sizeMin: 130, sizeMax: 170 },
+                { topMin: 42, topMax: 54, leftMin: 42, leftMax: 50, sizeMin: 115, sizeMax: 150 },
+                { topMin: 62, topMax: 74, leftMin: -3, leftMax: 5,  sizeMin: 130, sizeMax: 175 },
+                { topMin: 78, topMax: 88, leftMin: 88, leftMax: 94, sizeMin: 135, sizeMax: 180 },
+                { topMin: 90, topMax: 96, leftMin: 50, leftMax: 65, sizeMin: 120, sizeMax: 160 }
             ];
 
             zones.forEach((z, idx) => {
